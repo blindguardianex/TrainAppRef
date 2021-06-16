@@ -1,3 +1,9 @@
+# Config files
+*.yml
+
+# idea files
+.idea
+
 # Compiled class file
 *.class
 

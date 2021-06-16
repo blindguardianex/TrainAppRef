@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.smartru.common.entity.Task" table="tasks">
+        <meta attribute="class-description">
+            This class contains task's details.
+        </meta>
+        <id name="id" type="long" column="id">
+            <generator class="native"/>
+        </id>
+        <property name="created" column="created" type="timestamp" update="false" insert="false" generated="insert"/>
+        <property name="updated" column="updated" type="timestamp" update="false" insert="false" generated="always"/>
+        <property name="status" column="status">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">com.smartru.common.entity.BaseEntity.Status</param>
+                <param name="useNamed">true</param>
+            </type>
+        </property>
+
+        <property name="taskBody" column="task_body" type="string"/>
+        <one-to-one name="result" class="com.smartru.common.entity.TaskResult" cascade="save-update"/>
+    </class>
+</hibernate-mapping>
