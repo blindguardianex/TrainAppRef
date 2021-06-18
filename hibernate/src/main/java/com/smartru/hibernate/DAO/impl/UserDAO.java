@@ -1,4 +1,4 @@
-package com.smartru.hibernate.repository;
+package com.smartru.hibernate.DAO.impl;
 
 import com.smartru.common.entity.User;
 import org.hibernate.Session;
@@ -11,31 +11,11 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public class UserRep {
+public class UserDAO extends GenericDAOImpl<User, Long>{
 
     @Autowired
-    private SessionFactory sessionFactory;
-
-    public User save(User user){
-        try(Session session = sessionFactory.openSession()) {
-            Transaction transaction = null;
-
-            transaction = session.beginTransaction();
-            session.save(user);
-            transaction.commit();
-        }
-        return user;
-    }
-
-    public User update(User user){
-        try(Session session = sessionFactory.openSession()) {
-            Transaction transaction = null;
-
-            transaction = session.beginTransaction();
-            session.update(user);
-            transaction.commit();
-        }
-        return user;
+    public UserDAO(SessionFactory sessionFactory) {
+        super(sessionFactory, User.class);
     }
 
     public Optional<User> findByUsername(String login){

@@ -2,14 +2,14 @@ package com.smartru.hibernate.service;
 
 import com.smartru.common.entity.User;
 import com.smartru.common.exceptions.EntityAlreadyExists;
-import com.smartru.common.exceptions.EntityNotFound;
 import com.smartru.common.service.jpa.UserService;
-import com.smartru.hibernate.repository.UserRep;
+import com.smartru.hibernate.DAO.impl.UserDAO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 
@@ -19,7 +19,7 @@ import java.util.Optional;
 public class UserServiceHibernateImpl implements UserService {
 
     @Autowired
-    private UserRep userRepository;
+    private UserDAO userRepository;
 
     @Override
     public User add(User user) throws EntityAlreadyExists {
@@ -54,6 +54,6 @@ public class UserServiceHibernateImpl implements UserService {
             return user;
         }
         log.warn("HIBERNATE IN update - user: {} is absent", user.getLogin());
-        throw new EntityNotFound("User is absent");
+        throw new EntityNotFoundException("User is absent");
     }
 }

@@ -1,15 +1,14 @@
 package com.smartru.jpa.service;
 
 import com.smartru.common.entity.Task;
-import com.smartru.common.exceptions.EntityNotFound;
 import com.smartru.common.service.jpa.TaskService;
 import com.smartru.jpa.repository.TaskRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 @Slf4j
@@ -36,6 +35,6 @@ public class TaskServiceJpaImpl implements TaskService {
             return task;
         }
         log.warn("JPA IN update - task#{} is absent", task.getId());
-        throw new EntityNotFound("Task is absent");
+        throw new EntityNotFoundException("Task is absent");
     }
 }

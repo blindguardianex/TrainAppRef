@@ -1,9 +1,13 @@
 package com.smartru.common.exceptions;
 
+
 /**
  * Непроверяемое исключение, возникающее в случае попытки обновления
  * несуществующей сущности
+ * Изменил на использование стандартного исключения:
+ * @see javax.persistence.EntityNotFoundException
  */
+@Deprecated
 public class EntityNotFound extends RuntimeException {
 
     public EntityNotFound() {

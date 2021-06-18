@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
 @Entity
@@ -13,10 +14,11 @@ import javax.validation.constraints.NotBlank;
 public class Task extends BaseEntity{
 
     @NotBlank
-    @Column(name = "task_body")
+    @Access(AccessType.FIELD)
+    @Column(name = "task_body", nullable = false)
     private String taskBody;
 
-    @OneToOne(targetEntity = TaskResult.class, cascade = CascadeType.ALL)
+    @OneToOne(targetEntity = TaskResult.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "result")
     private TaskResult result;
 

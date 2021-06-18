@@ -19,17 +19,17 @@ public class User extends BaseEntity{
 
     @NotBlank
     @Size(min = 5, message = "Минимальная длинна логина: 5 символов")
-    @Column(name = "login")
+    @Column(name = "login", nullable = false)
     private String login;
 
     @JsonIgnore
     @NotBlank
     @Size(min = 6, message = "Минимальная длинна пароля: 6 символов")
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
     @NotNull
-    @Column(name = "role")
+    @Column(name = "role", nullable = false)
     private String role;
 
     @JsonIgnore

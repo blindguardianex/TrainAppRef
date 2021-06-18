@@ -2,7 +2,7 @@ package com.smartru.hibernate.service;
 
 import com.smartru.common.entity.Task;
 import com.smartru.common.service.jpa.TaskService;
-import com.smartru.hibernate.repository.TaskRep;
+import com.smartru.hibernate.DAO.impl.TaskDAO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 public class TaskServiceHibernateImpl implements TaskService {
 
     @Autowired
-    private TaskRep taskRepository;
+    private TaskDAO taskRepository;
 
     @Override
     public Task add(Task task) {
@@ -27,7 +27,7 @@ public class TaskServiceHibernateImpl implements TaskService {
 
     @Override
     public Task update(Task task) {
-        task = taskRepository.save(task);
+        task = taskRepository.update(task);
         log.info("HIBERNATE IN update - task#{} successfully updated in database",task.getId());
         return task;
     }

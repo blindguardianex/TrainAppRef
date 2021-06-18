@@ -18,18 +18,18 @@ import javax.validation.constraints.NotNull;
 @Table(name = "task_results")
 @NoArgsConstructor
 @AllArgsConstructor
+@org.hibernate.annotations.Immutable
 public class TaskResult extends BaseEntity{
 
     @NotNull
     @JsonIgnore
-    @OneToOne(targetEntity = Task.class,
-            cascade = CascadeType.MERGE,
-            fetch = FetchType.LAZY)
-    @JoinColumn(name = "task")
+    @Access(AccessType.FIELD)
+    @OneToOne(targetEntity = Task.class, cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    @JoinColumn(name = "task", nullable = false)
     private Task task;
 
-    @NotBlank
-    @Column(name = "result_body")
+    @Access(AccessType.FIELD)
+    @Column(name = "result_body", nullable = false)
     private String result;
 
     @Override
