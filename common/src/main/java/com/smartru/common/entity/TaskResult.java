@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -29,14 +28,14 @@ public class TaskResult extends BaseEntity{
     private Task task;
 
     @Access(AccessType.FIELD)
-    @Column(name = "result_body", nullable = false)
-    private String result;
+    @Column(name = "is_prime", nullable = false)
+    private boolean isPrime;
 
     @Override
     public String toString() {
         return "TaskResult{" +
                 "task_id='"+ task.getId() + '\'' +
-                "result='" + result + '\'' +
+                "result='" + isPrime + '\'' +
                 '}';
     }
 }

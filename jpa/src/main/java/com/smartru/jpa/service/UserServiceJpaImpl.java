@@ -1,5 +1,6 @@
 package com.smartru.jpa.service;
 
+import com.smartru.common.entity.Task;
 import com.smartru.common.entity.User;
 import com.smartru.common.exceptions.EntityAlreadyExists;
 import com.smartru.common.service.jpa.UserService;
@@ -45,8 +46,7 @@ public class UserServiceJpaImpl implements UserService {
 
     @Override
     public User update(User user) {
-        Optional<User>optUser = repository.findByUsername(user.getLogin());
-        if (optUser.isPresent()){
+        if (repository.existsById(user.getId())){
             user = repository.saveAndFlush(user);
             log.info("JPA IN update - user: {} successfully updated in database",user.getLogin());
             return user;

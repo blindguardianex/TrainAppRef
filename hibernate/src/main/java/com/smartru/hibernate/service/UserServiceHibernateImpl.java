@@ -1,5 +1,6 @@
 package com.smartru.hibernate.service;
 
+import com.smartru.common.entity.Task;
 import com.smartru.common.entity.User;
 import com.smartru.common.exceptions.EntityAlreadyExists;
 import com.smartru.common.service.jpa.UserService;

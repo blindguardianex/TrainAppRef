@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @Primary
@@ -21,7 +23,7 @@ public class TaskServiceHibernateImpl implements TaskService {
     @Override
     public Task add(Task task) {
         task = taskRepository.save(task);
-        log.info("HIBERNATE IN add - task: {} successfully saved", task.getTaskBody());
+        log.info("HIBERNATE IN add - task: {} successfully saved", task.getNum());
         return task;
     }
 
@@ -30,5 +32,12 @@ public class TaskServiceHibernateImpl implements TaskService {
         task = taskRepository.update(task);
         log.info("HIBERNATE IN update - task#{} successfully updated in database",task.getId());
         return task;
+    }
+
+    @Override
+    public List<Task> getAllTasksByUser(String login) {
+        List<Task>tasks = taskRepository.findByUser(login);
+        log.info("HIBERNATE IN getAllTasksByUser - by user: {} find {} tasks",login, tasks.size());
+        return tasks;
     }
 }

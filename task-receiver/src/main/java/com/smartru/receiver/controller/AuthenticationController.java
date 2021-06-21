@@ -3,6 +3,7 @@ package com.smartru.receiver.controller;
 import com.smartru.common.dto.AuthenticationRequestDto;
 import com.smartru.common.entity.User;
 import com.smartru.common.service.jpa.UserService;
+import com.smartru.receiver.configuration.security.SecurityUser;
 import com.smartru.receiver.configuration.security.jwt.JwtTokenProvider;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
@@ -11,9 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.Map;
 
 @Slf4j

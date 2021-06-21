@@ -57,7 +57,7 @@ public abstract class GenericDAOImpl<T, ID> implements GenericDAO <T, ID> {
     public T update(T entity) {
         try(Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
-            session.merge(entity);
+            session.update(entity);
             transaction.commit();
         }
         return entity;

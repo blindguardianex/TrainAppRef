@@ -26,6 +26,7 @@ class FullTest extends Simulation{
                 .body(
                   StringBody("""{"username": "${user}", "password": "${password}"}""")).asJson
                 .check(jsonPath("$..accessToken").optional.saveAs("accessToken"))
+                .check(status.is(200))
     )
 
   val postTask = repeat(3)(
@@ -35,7 +36,8 @@ class FullTest extends Simulation{
                   .post("/task/add")
                   .header("Authorization","Bearer_${accessToken}")
                   .body(
-                    StringBody("""{"taskBody": "${taskBody}"}""")).asJson)
+                    StringBody("""{"num": "${taskBody}"}""")).asJson
+                  .check(status.is(200)))
   )
 
   val scn: ScenarioBuilder = scenario("Auth and post task")
@@ -44,8 +46,8 @@ class FullTest extends Simulation{
     })
 
   setUp(
-    scn.inject(constantUsersPerSec(200) during(1 minutes))
+    scn.inject(constantUsersPerSec(77) during(1 minutes))
 //    scn.inject(atOnceUsers(120))
-//    scn.inject(rampUsers(4000) during(1 minutes))
+//    scn.inject(rampUsers(2500) during(1 minutes))
   ).protocols(httpConf)
 }

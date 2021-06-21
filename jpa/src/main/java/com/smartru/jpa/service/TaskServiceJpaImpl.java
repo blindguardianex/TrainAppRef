@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -22,19 +23,25 @@ public class TaskServiceJpaImpl implements TaskService {
     @Override
     public Task add(Task task) {
         task = taskRepository.saveAndFlush(task);
-        log.info("JPA IN add - task: {} successfully saved", task.getTaskBody());
+        log.info("JPA IN add - task: {} successfully saved", task.getNum());
         return task;
     }
 
     @Override
     public Task update(Task task) {
-        Optional<Task> optTask = taskRepository.findById(task.getId());
-        if (optTask.isPresent()){
+        if (taskRepository.existsById(task.getId())){
             task=taskRepository.saveAndFlush(task);
             log.info("JPA IN update - task#{} successfully updated in database",task.getId());
             return task;
         }
         log.warn("JPA IN update - task#{} is absent", task.getId());
         throw new EntityNotFoundException("Task is absent");
+    }
+
+    @Override
+    public List<Task> getAllTasksByUser(String login) {
+        List<Task>tasks = taskRepository.findByUser(login);
+        log.info("JPA IN getAllTasksByUser - by user: {} find {} tasks",login, tasks.size());
+        return tasks;
     }
 }

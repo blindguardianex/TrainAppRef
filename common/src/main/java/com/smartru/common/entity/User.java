@@ -9,6 +9,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -40,6 +42,10 @@ public class User extends BaseEntity{
     @Column(name = "refresh_token")
     private String refreshToken;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
+    private List<Task>tasks = new ArrayList<>();
+
     @PrePersist
     void init(){
         role = "USER";
@@ -49,6 +55,10 @@ public class User extends BaseEntity{
     public User(String login, String password) {
         this.login = login;
         this.password = password;
+    }
+
+    public void addTask(Task task){
+        tasks.add(task);
     }
 
     @Override
