@@ -7,6 +7,7 @@ import org.hibernate.Transaction;
 
 import javax.persistence.criteria.CriteriaQuery;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class GenericDAOImpl<T, ID> implements GenericDAO <T, ID> {
 
@@ -19,9 +20,9 @@ public abstract class GenericDAOImpl<T, ID> implements GenericDAO <T, ID> {
     }
 
     @Override
-    public T findByID(ID id) {
+    public Optional<T> findByID(ID id) {
         try(Session session = sessionFactory.openSession()){
-            return session.find(entityClass, id);
+            return Optional.of(session.find(entityClass, id));
         }
     }
 

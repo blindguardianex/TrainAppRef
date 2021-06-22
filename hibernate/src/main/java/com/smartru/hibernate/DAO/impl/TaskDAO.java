@@ -2,6 +2,7 @@ package com.smartru.hibernate.DAO.impl;
 
 import com.smartru.common.entity.Task;
 import com.smartru.common.entity.User;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -43,6 +44,29 @@ public class TaskDAO extends GenericDAOImpl<Task, Long>{
             List<Task>tasks = query.getResultList();
             transaction.commit();
             return tasks;
+        }
+    }
+
+    public Optional<Task> getFullTaskById(long id){
+        try (Session session = sessionFactory.openSession()){
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Task> criteriaQuery = cb.createQuery(Task.class);
+            Root<Task>root = criteriaQuery.from(Task.class);
+
+            Query<Task>query=session.createQuery(
+                    criteriaQuery.select(root).where(
+                            cb.equal(
+                                    root.get("id"),
+                                    cb.parameter(Long.class, "taskId")
+                            )
+                    )
+            ).setParameter("taskId", id);
+
+            Transaction transaction = session.beginTransaction();
+            Task task = query.getSingleResult();
+            Hibernate.initialize(task.getUser());
+            transaction.commit();
+            return Optional.of(task);
         }
     }
 }

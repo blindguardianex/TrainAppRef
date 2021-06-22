@@ -20,6 +20,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                                                                     "/api/refresh_token"};
     private static final String[] AUTHENTICATED_ENDPOINTS = new String[]{"/api/task/add",
                                                                     "/api/task/all",
+                                                                    "/api/task/get",
                                                                     "/api/test/auth"};
     private static final String[] ADMIN_ENDPOINTS = new String[]{"/api/for_admin"};
 

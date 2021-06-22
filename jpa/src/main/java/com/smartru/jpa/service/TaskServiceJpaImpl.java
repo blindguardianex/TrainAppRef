@@ -44,4 +44,15 @@ public class TaskServiceJpaImpl implements TaskService {
         log.info("JPA IN getAllTasksByUser - by user: {} find {} tasks",login, tasks.size());
         return tasks;
     }
+
+    @Override
+    public Optional<Task> getById(long id) {
+        Optional<Task> task = taskRepository.getFullTaskById(id);
+        if(task.isPresent()){
+            log.info("JPA IN getById - by id #{} find task", id);
+        } else {
+            log.warn("JPA IN getById - not found task by id #{}", id);
+        }
+        return task;
+    }
 }

@@ -17,4 +17,6 @@ public interface TaskRepository extends JpaRepository<Task,Long> {
     @Query("SELECT t FROM Task t WHERE t.user.login = :login")
     List<Task> findByUser(@Param("login") String login);
 
+    @Query("SELECT t FROM Task t LEFT JOIN FETCH t.user WHERE t.id = :id")
+    Optional<Task> getFullTaskById(@Param("id") long id);
 }

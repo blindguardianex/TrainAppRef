@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -43,6 +44,24 @@ public class TaskController {
         task = taskService.add(task);
         taskRabbitService.sendTask(task);
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @GetMapping("get")
+    public ResponseEntity<TaskResultDto> getTask(@RequestParam long taskId, Principal principal){
+        Optional<Task> optTask = taskService.getById(taskId);
+        if (optTask.isPresent()){
+            Task task = optTask.get();
+            if (task.getUser().getLogin().equals(principal.getName())) {
+                return new ResponseEntity<>(TaskResultDto.fromTask(task), HttpStatus.OK);
+            }
+            else {
+                log.warn("Trying to get someone else's task by: {}",principal.getName());
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+        }
+        else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("all")

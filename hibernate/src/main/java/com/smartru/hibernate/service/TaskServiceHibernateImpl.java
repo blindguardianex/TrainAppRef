@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -39,5 +40,16 @@ public class TaskServiceHibernateImpl implements TaskService {
         List<Task>tasks = taskRepository.findByUser(login);
         log.info("HIBERNATE IN getAllTasksByUser - by user: {} find {} tasks",login, tasks.size());
         return tasks;
+    }
+
+    @Override
+    public Optional<Task> getById(long id) {
+        Optional<Task> task = taskRepository.getFullTaskById(id);
+        if(task.isPresent()){
+            log.info("HIBERNATE IN getById - by id #{} find task", id);
+        } else {
+            log.warn("HIBERNATE IN getById - not found task by id #{}", id);
+        }
+        return task;
     }
 }

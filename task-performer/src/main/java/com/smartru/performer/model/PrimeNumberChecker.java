@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Данный класс проверяет числа на простоту
@@ -25,16 +27,16 @@ public class PrimeNumberChecker {
     /** Паттерн для проверки переданного числа */
     private final String NUMBER_PATTERN = "\\A\\d*\\Z";
 
-    private final BigInteger THREE = new BigInteger("3");
-    private final BigInteger SEVEN = new BigInteger("7");
-    private final BigInteger ELEVEN = new BigInteger("11");
-    private final BigInteger THIRTEEN = new BigInteger("13");
-    private final BigInteger SEVENTEEN = new BigInteger("17");
-    private final BigInteger NINETEEN = new BigInteger("19");
-    private final BigInteger TWENTY_THREE = new BigInteger("23");
-    private final BigInteger TWENTY_NINE = new BigInteger("29");
+    private final BigInteger THREE = BigInteger.valueOf(3L);
+    private final BigInteger SEVEN = BigInteger.valueOf(7L);
+    private final BigInteger ELEVEN = BigInteger.valueOf(11L);
+    private final BigInteger THIRTEEN = BigInteger.valueOf(13L);
+    private final BigInteger SEVENTEEN = BigInteger.valueOf(17L);
+    private final BigInteger NINETEEN = BigInteger.valueOf(19L);
+    private final BigInteger TWENTY_THREE = BigInteger.valueOf(23L);
+    private final BigInteger TWENTY_NINE = BigInteger.valueOf(29L);
 
-    private final BigInteger THIRTY = new BigInteger("30");
+    private static final BigInteger THIRTY = BigInteger.valueOf(30L);
 
     public boolean isPrimeNumber(String num){
         if (isNumeric(num)){
@@ -82,7 +84,7 @@ public class PrimeNumberChecker {
      * @return
      */
     private boolean longCheck(BigInteger num){
-        log.info("Maybe it's a prime number...");
+        log.info("Maybe num #{} is prime number...", num);
         if (findDivisorsBefore30(num)){
             System.out.println("EZ");
             return false;
@@ -90,17 +92,17 @@ public class PrimeNumberChecker {
         BigInteger bound = num.sqrt();
         long startMillis = System.currentTimeMillis();
 
-        //Threadlocal?
-        BigInteger thirtyOne = new BigInteger("31");
-        BigInteger thirtySeven = new BigInteger("37");
-        BigInteger fortyOne = new BigInteger("41");
-        BigInteger fortyThree = new BigInteger("43");
-        BigInteger fortySeven = new BigInteger("47");
-        BigInteger fortyNine = new BigInteger("49");
-        BigInteger fiftyThree = new BigInteger("53");
-        BigInteger fiftyNine = new BigInteger("59");
+        BigInteger thirtyOne = BigInteger.valueOf(31L);
+        BigInteger thirtySeven = BigInteger.valueOf(37L);
+        BigInteger fortyOne = BigInteger.valueOf(41L);
+        BigInteger fortyThree = BigInteger.valueOf(43L);
+        BigInteger fortySeven = BigInteger.valueOf(47L);
+        BigInteger fortyNine = BigInteger.valueOf(49L);
+        BigInteger fiftyThree = BigInteger.valueOf(53L);
+        BigInteger fiftyNine = BigInteger.valueOf(59L);
 
-        while (thirtyOne.compareTo(bound)<=0 || (
+
+        while (checkBound(thirtyOne,bound) || (
                 num.mod(thirtyOne).equals(BigInteger.ZERO) ||
                 num.mod(thirtySeven).equals(BigInteger.ZERO) ||
                 num.mod(fortyOne).equals(BigInteger.ZERO) ||
@@ -119,7 +121,8 @@ public class PrimeNumberChecker {
             fiftyThree = fiftyThree.add(THIRTY);
             fiftyNine = fiftyNine.add(THIRTY);
         }
-        System.out.println("Checking time: "+(System.currentTimeMillis()-startMillis)/1000+" minutes");
+
+        System.out.println("Checking time: "+ TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis()-startMillis)+" minutes");
         if(thirtyOne.compareTo(bound)<0){
             System.out.println(thirtyOne);
             System.out.println(bound);
@@ -128,6 +131,15 @@ public class PrimeNumberChecker {
         return true;
     }
 
+    private boolean checkBound(BigInteger min, BigInteger bound){
+        return min.compareTo(bound)<=0;
+    }
+
+    /**
+     * Проверяет все простые делители до 30
+     * @param num
+     * @return
+     */
     private boolean findDivisorsBefore30(BigInteger num){
         return num.mod(THREE).equals(BigInteger.ZERO) ||
                 num.mod(SEVEN).equals(BigInteger.ZERO) ||
