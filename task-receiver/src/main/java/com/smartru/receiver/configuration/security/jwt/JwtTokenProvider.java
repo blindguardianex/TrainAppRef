@@ -151,7 +151,7 @@ public class JwtTokenProvider {
 
     private boolean checkTokenInRedis(String token){
             if (!redis.tokenExists(token)) {
-                log.error("Access token is invalid");
+                log.error("Access token is not found");
                 return false;
             }
             return true;

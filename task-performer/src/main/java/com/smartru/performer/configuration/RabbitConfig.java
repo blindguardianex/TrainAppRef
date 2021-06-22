@@ -2,6 +2,7 @@ package com.smartru.performer.configuration;
 
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.RabbitListenerContainerFactory;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -14,6 +15,10 @@ import org.springframework.context.annotation.Configuration;
 @EnableRabbit
 public class RabbitConfig{
 
+    @Value("${spring.rabbitmq.username}")
+    private String login;
+    @Value("${spring.rabbitmq.password}")
+    private String password;
     @Value("${spring.rabbitmq.host}")
     private String host;
     @Value("${spring.rabbitmq.port}")
@@ -32,6 +37,16 @@ public class RabbitConfig{
     @Bean
     public MessageConverter messageConverter(){
         return new Jackson2JsonMessageConverter();
+    }
+
+    @Bean
+    public ConnectionFactory connectionFactory(){
+        CachingConnectionFactory factory = new CachingConnectionFactory();
+        factory.setAddresses(host);
+        factory.setPort(port);
+        factory.setUsername(login);
+        factory.setPassword(password);
+        return factory;
     }
 
     @Bean

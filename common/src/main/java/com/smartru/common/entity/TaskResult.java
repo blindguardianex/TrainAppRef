@@ -17,13 +17,13 @@ import javax.validation.constraints.NotNull;
 @Table(name = "task_results")
 @NoArgsConstructor
 @AllArgsConstructor
-@org.hibernate.annotations.Immutable
+//@org.hibernate.annotations.Immutable
 public class TaskResult extends BaseEntity{
 
     @NotNull
     @JsonIgnore
     @Access(AccessType.FIELD)
-    @OneToOne(targetEntity = Task.class, cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    @OneToOne(targetEntity = Task.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "task", nullable = false)
     private Task task;
 

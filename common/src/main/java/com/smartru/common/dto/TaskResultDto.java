@@ -12,15 +12,13 @@ public class TaskResultDto {
 
     private final long taskId;
     private final String num;
-    private final String isPrime;
+    private final String result;
 
     public static TaskResultDto fromTask(Task task){
-        String isPrime = resultFromTask(task);
-
         TaskResultDto resultDto = new TaskResultDto(
                 task.getId(),
                 task.getNum(),
-                isPrime);
+                resultFromTask(task));
         return resultDto;
     }
 

@@ -1,7 +1,9 @@
 package com.smartru.receiver.controller;
 
 import com.smartru.common.dto.AuthenticationRequestDto;
+import com.smartru.common.dto.RegistrationRequestDto;
 import com.smartru.common.entity.User;
+import com.smartru.common.exceptions.EntityAlreadyExists;
 import com.smartru.common.service.jpa.UserService;
 import com.smartru.receiver.configuration.security.SecurityUser;
 import com.smartru.receiver.configuration.security.jwt.JwtTokenProvider;
@@ -56,6 +58,16 @@ public class AuthenticationController {
             return ResponseEntity.ok(response);
         } catch (UsernameNotFoundException | JwtException ex) {
             log.error("Incorrect refresh token");
+            return new ResponseEntity(HttpStatus.FORBIDDEN);
+        }
+    }
+
+    @PostMapping("signUp")
+    public ResponseEntity registration(@RequestBody RegistrationRequestDto registrationRequest){
+        try {
+            userService.add(registrationRequest.toUser());
+            return new ResponseEntity(HttpStatus.OK);
+        } catch (EntityAlreadyExists entityAlreadyExists) {
             return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
     }

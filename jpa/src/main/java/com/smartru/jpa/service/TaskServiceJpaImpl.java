@@ -1,12 +1,15 @@
 package com.smartru.jpa.service;
 
+import com.smartru.common.entity.BaseEntity;
 import com.smartru.common.entity.Task;
+import com.smartru.common.service.jpa.TaskResultService;
 import com.smartru.common.service.jpa.TaskService;
 import com.smartru.jpa.repository.TaskRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
@@ -54,5 +57,16 @@ public class TaskServiceJpaImpl implements TaskService {
             log.warn("JPA IN getById - not found task by id #{}", id);
         }
         return task;
+    }
+
+    @Override
+    @Transactional
+    public void setDeletedStatus(Task task) {
+        task.setStatus(BaseEntity.Status.DELETED);
+        if (task.getResult()!=null){
+            task.getResult().setStatus(BaseEntity.Status.DELETED);
+        }
+        update(task);
+        log.info("JPA IN setDeletedStatus - task #{} successfully set deleted status", task.getId());
     }
 }

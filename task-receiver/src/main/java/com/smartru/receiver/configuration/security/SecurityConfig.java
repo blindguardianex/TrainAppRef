@@ -19,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String[] PERMIT_ALL_ENDPOINTS = new String[]{"/api/sign",
+                                                                    "/api/signUp",
                                                                     "/api/refresh_token"};
     private static final String[] AUTHENTICATED_ENDPOINTS = new String[]{"/api/task/add",
                                                                     "/api/tasks/",

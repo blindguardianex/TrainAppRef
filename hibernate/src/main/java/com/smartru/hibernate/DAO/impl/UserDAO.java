@@ -11,6 +11,7 @@ import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.NoResultException;
 import java.util.Optional;
 
 @Repository
@@ -22,7 +23,6 @@ public class UserDAO extends GenericDAOImpl<User, Long>{
     }
 
     public Optional<User> findByUsername(String login){
-        Optional<User>result = null;
         try(Session session = sessionFactory.openSession()){
             Transaction transaction = null;
             Query<User> getByUsernameQuery = session.createQuery("SELECT u FROM User u WHERE u.login = :login");
@@ -31,13 +31,9 @@ public class UserDAO extends GenericDAOImpl<User, Long>{
             transaction = session.beginTransaction();
             User user = getByUsernameQuery.getSingleResult();
             transaction.commit();
-
-            if (user!=null) {
-                result = Optional.of(user);
-            } else {
-                result = Optional.empty();
-            }
+            return Optional.of(user);
+        } catch (NoResultException ex){
+            return Optional.empty();
         }
-        return result;
     }
 }

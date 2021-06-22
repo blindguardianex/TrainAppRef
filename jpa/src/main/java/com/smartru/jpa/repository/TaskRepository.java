@@ -14,7 +14,7 @@ import java.util.Optional;
 @Repository
 public interface TaskRepository extends JpaRepository<Task,Long> {
 
-    @Query("SELECT t FROM Task t WHERE t.user.login = :login")
+    @Query("SELECT t FROM Task t WHERE t.user.login = :login AND t.status = 'ACTIVE'")
     List<Task> findByUser(@Param("login") String login);
 
     @Query("SELECT t FROM Task t LEFT JOIN FETCH t.user WHERE t.id = :id")

@@ -1,6 +1,8 @@
 package com.smartru.hibernate.service;
 
+import com.smartru.common.entity.BaseEntity;
 import com.smartru.common.entity.Task;
+import com.smartru.common.service.jpa.TaskResultService;
 import com.smartru.common.service.jpa.TaskService;
 import com.smartru.hibernate.DAO.impl.TaskDAO;
 import lombok.extern.slf4j.Slf4j;
@@ -51,5 +53,15 @@ public class TaskServiceHibernateImpl implements TaskService {
             log.warn("HIBERNATE IN getById - not found task by id #{}", id);
         }
         return task;
+    }
+
+    @Override
+    public void setDeletedStatus(Task task) {
+        task.setStatus(BaseEntity.Status.DELETED);
+        if (task.getResult()!=null){
+            task.getResult().setStatus(BaseEntity.Status.DELETED);
+        }
+        update(task);
+        log.info("HIBERNATE IN setDeletedStatus - task #{} successfully set deleted status", task.getId());
     }
 }

@@ -11,4 +11,5 @@ public interface TaskService {
     Task update(Task task);
     List<Task> getAllTasksByUser(String login);
     Optional<Task> getById(long id);
+    void setDeletedStatus(Task task);
 }
