@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/api/task/",
+@RequestMapping(value = "/api/tasks",
         consumes="application/json")
 public class TaskController {
 
@@ -37,7 +37,7 @@ public class TaskController {
         this.taskRabbitService = taskRabbitService;
     }
 
-    @PostMapping("add")
+    @PostMapping()
     public ResponseEntity addTask(@RequestBody Task task, Principal principal){
         User user = userService.getByUsername(principal.getName()).get();
         task.setUser(user);
@@ -46,8 +46,8 @@ public class TaskController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @GetMapping("get")
-    public ResponseEntity<TaskResultDto> getTask(@RequestParam long taskId, Principal principal){
+    @GetMapping("/{id}")
+    public ResponseEntity<TaskResultDto> getTask(@PathVariable("id") long taskId, Principal principal){
         Optional<Task> optTask = taskService.getById(taskId);
         if (optTask.isPresent()){
             Task task = optTask.get();
@@ -64,7 +64,7 @@ public class TaskController {
         }
     }
 
-    @GetMapping("all")
+    @GetMapping()
     public List<TaskResultDto> getTasks(Principal principal){
         List<Task>tasks = taskService.getAllTasksByUser(principal.getName());
         return tasks.stream()
