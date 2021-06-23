@@ -8,6 +8,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 @Data
 @Entity
@@ -15,7 +16,6 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 public class Task extends BaseEntity{
 
-    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user", nullable = false)
     private User user;
@@ -23,6 +23,7 @@ public class Task extends BaseEntity{
     @NotBlank
     @Access(AccessType.FIELD)
     @Pattern(regexp = "\\A\\d*\\Z", message = "Введенная строка не является числом")
+    @Size(max = 23, message = "Введенное число слишком большое")
     @Column(name = "num", nullable = false)
     private String num;
 

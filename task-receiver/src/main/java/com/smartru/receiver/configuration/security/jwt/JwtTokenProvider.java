@@ -60,6 +60,7 @@ public class JwtTokenProvider {
 
     public Map<Object,Object> refreshTokens(String refreshToken, String accessToken){
         if(validateRefreshToken(refreshToken,accessToken)){
+            accessToken = accessToken.substring(7);
             String username = getLogin(accessToken);
             User user = userService.getByUsername(username).orElseThrow(()->{
                 throw new UsernameNotFoundException("User with username: " + username + " not found");

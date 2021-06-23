@@ -64,4 +64,9 @@ public class TaskServiceHibernateImpl implements TaskService {
         update(task);
         log.info("HIBERNATE IN setDeletedStatus - task #{} successfully set deleted status", task.getId());
     }
+
+    @Override
+    public Optional<Task> getByNum(String num) {
+        return taskRepository.findPerformedTaskByNum(num);
+    }
 }

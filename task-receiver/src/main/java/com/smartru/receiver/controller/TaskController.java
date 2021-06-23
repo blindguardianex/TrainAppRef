@@ -1,6 +1,6 @@
 package com.smartru.receiver.controller;
 
-import com.smartru.common.dto.TaskResultDto;
+import com.smartru.common.dto.TaskDto;
 import com.smartru.common.entity.BaseEntity;
 import com.smartru.common.entity.Task;
 import com.smartru.common.entity.User;
@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
@@ -39,16 +40,16 @@ public class TaskController {
     }
 
     @PostMapping()
-    public ResponseEntity addTask(@RequestBody Task task, Principal principal){
+    public ResponseEntity<TaskDto> addTask(@Valid @RequestBody Task task, Principal principal){
         User user = userService.getByUsername(principal.getName()).get();
         task.setUser(user);
         task = taskService.add(task);
         taskRabbitService.sendTask(task);
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity(TaskDto.fromTask(task), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TaskResultDto> getTask(@PathVariable("id") long taskId, Principal principal){
+    public ResponseEntity<TaskDto> getTask(@PathVariable("id") long taskId, Principal principal){
         Optional<Task> optTask = taskService.getById(taskId);
 //        if (optTask.isPresent()){
 //            Task task = optTask.get();
@@ -77,14 +78,14 @@ public class TaskController {
                     log.warn("Trying to get someone else's task or not active task by: {}",principal.getName());
                     return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        return new ResponseEntity<>(TaskResultDto.fromTask(task), HttpStatus.OK);
+        return new ResponseEntity<>(TaskDto.fromTask(task), HttpStatus.OK);
     }
 
     @GetMapping()
-    public List<TaskResultDto> getTasks(Principal principal){
+    public List<TaskDto> getTasks(Principal principal){
         List<Task>tasks = taskService.getAllTasksByUser(principal.getName());
         return tasks.stream()
-                .map(TaskResultDto::fromTask)
+                .map(TaskDto::fromTask)
                 .collect(Collectors.toList());
     }
 

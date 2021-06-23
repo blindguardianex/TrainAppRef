@@ -83,4 +83,34 @@ public class TaskDAO extends GenericDAOImpl<Task, Long>{
             return Optional.empty();
         }
     }
+
+    public Optional<Task> findPerformedTaskByNum(String num){
+        try (Session session = sessionFactory.openSession()){
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Task> criteriaQuery = cb.createQuery(Task.class);
+            Root<Task>root = criteriaQuery.from(Task.class);
+
+            List<Predicate>predicates=new ArrayList<>();
+            predicates.add(cb.equal(
+                    root.get("num"),
+                    cb.parameter(String.class, "taskNum")
+            ));
+            predicates.add(cb.isNotNull(root.get("result")));
+
+
+            Query<Task>query=session.createQuery(
+                    criteriaQuery.select(root).where(
+                            predicates.toArray(new Predicate[]{})
+                    )
+            ).setParameter("taskNum", num);
+
+            Transaction transaction = session.beginTransaction();
+            Task task = query.setMaxResults(1).getSingleResult();
+            Hibernate.initialize(task.getUser());
+            transaction.commit();
+            return Optional.of(task);
+        } catch (NoResultException ex){
+            return Optional.empty();
+        }
+    }
 }

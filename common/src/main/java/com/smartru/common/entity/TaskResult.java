@@ -17,7 +17,6 @@ import javax.validation.constraints.NotNull;
 @Table(name = "task_results")
 @NoArgsConstructor
 @AllArgsConstructor
-//@org.hibernate.annotations.Immutable
 public class TaskResult extends BaseEntity{
 
     @NotNull

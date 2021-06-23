@@ -5,7 +5,7 @@ import com.smartru.common.dto.RegistrationRequestDto;
 import com.smartru.common.entity.User;
 import com.smartru.common.exceptions.EntityAlreadyExists;
 import com.smartru.common.service.jpa.UserService;
-import com.smartru.receiver.configuration.security.SecurityUser;
+import com.smartru.receiver.configuration.security.RegistrationProvider;
 import com.smartru.receiver.configuration.security.jwt.JwtTokenProvider;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
@@ -14,11 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
+import javax.validation.Valid;
 import java.util.Map;
 
 @Slf4j
@@ -30,13 +29,15 @@ public class AuthenticationController {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
+    private final RegistrationProvider registrationProvider;
 
     @Autowired
     public AuthenticationController(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager,
-                                    UserService userService) {
+                                    UserService userService, RegistrationProvider registrationProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
         this.userService = userService;
+        this.registrationProvider = registrationProvider;
     }
 
     @PostMapping("sign")
@@ -63,11 +64,13 @@ public class AuthenticationController {
     }
 
     @PostMapping("signUp")
-    public ResponseEntity registration(@RequestBody RegistrationRequestDto registrationRequest){
+    public ResponseEntity registration(@Valid @RequestBody RegistrationRequestDto registrationRequest){
         try {
-            userService.add(registrationRequest.toUser());
+            log.info("Registration new user: {}", registrationRequest.getUsername());
+            registrationProvider.registry(registrationRequest.toUser());
+            log.info("Successful registration user: {}", registrationRequest.getUsername());
             return new ResponseEntity(HttpStatus.OK);
-        } catch (EntityAlreadyExists entityAlreadyExists) {
+        } catch (EntityAlreadyExists ex) {
             return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
     }

@@ -4,8 +4,10 @@ import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 
+import java.util.concurrent.ThreadLocalRandom
 import scala.concurrent.duration._
 import scala.language.postfixOps
+import scala.util.Random
 
 class FullTest extends Simulation{
 
@@ -29,15 +31,27 @@ class FullTest extends Simulation{
                 .check(status.is(200))
     )
 
+//  val postTask = repeat(3)(
+//            feed(tasks)
+//              .exec(
+//                http("Post task")
+//                  .post("/task/add")
+//                  .header("Authorization","Bearer_${accessToken}")
+//                  .body(
+//                    StringBody("""{"num": "${taskBody}"}""")).asJson
+//                  .check(status.is(200)))
+//  )
+
+  def randomDef() = Random.nextLong(Long.MaxValue)
+
   val postTask = repeat(3)(
-            feed(tasks)
-              .exec(
-                http("Post task")
-                  .post("/task/add")
-                  .header("Authorization","Bearer_${accessToken}")
-                  .body(
-                    StringBody("""{"num": "${taskBody}"}""")).asJson
-                  .check(status.is(200)))
+      exec(
+        http("Post task")
+          .post("/tasks")
+          .header("Authorization","Bearer ${accessToken}")
+          .body(
+            StringBody(session => s"""{"num": "${randomDef()}"}""")).asJson
+          .check(status.is(200)))
   )
 
   val scn: ScenarioBuilder = scenario("Auth and post task")
@@ -46,7 +60,7 @@ class FullTest extends Simulation{
     })
 
   setUp(
-    scn.inject(constantUsersPerSec(77) during(1 minutes))
+    scn.inject(constantUsersPerSec(44) during(1 minutes))
 //    scn.inject(atOnceUsers(120))
 //    scn.inject(rampUsers(2500) during(1 minutes))
   ).protocols(httpConf)

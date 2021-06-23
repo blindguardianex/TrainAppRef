@@ -12,4 +12,5 @@ public interface TaskService {
     List<Task> getAllTasksByUser(String login);
     Optional<Task> getById(long id);
     void setDeletedStatus(Task task);
+    Optional<Task> getByNum(String num);
 }

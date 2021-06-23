@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -13,7 +12,7 @@ import java.util.concurrent.TimeUnit;
  *  1) Возвращает false, если переданная строка не является числом
  * @see PrimeNumberChecker#isNumeric(String)
  *  2) Возвращает false, если число делится на 2 или 5
- * @see PrimeNumberChecker#fastCheck(String)
+ * @see PrimeNumberChecker#fastCheckNotPrime(String)
  *  3) Возвращает false, если не пройдена проверка тестом Миллера-Рабина
  * @see BigInteger#isProbablePrime(int)
  *  4) В случае, если проверка Миллера-Рабина пройдена успешно, проходит тест,
@@ -36,19 +35,27 @@ public class PrimeNumberChecker {
     private final BigInteger TWENTY_THREE = BigInteger.valueOf(23L);
     private final BigInteger TWENTY_NINE = BigInteger.valueOf(29L);
 
-    private static final BigInteger THIRTY = BigInteger.valueOf(30L);
+    private final BigInteger THIRTY = BigInteger.valueOf(30L);
 
     public boolean isPrimeNumber(String num){
-        if (isNumeric(num)){
-            if(fastCheck(num)){
-                return false;
-            }
-            BigInteger bigIntNum = new BigInteger(num);
-            if(bigIntNum.isProbablePrime(1000000)){
-                return longCheck(bigIntNum);
-            }
+        if (!isNumeric(num) || fastCheckNotPrime(num)) {
+            return false;
+        }
+        BigInteger bigIntNum = new BigInteger(num);
+        if(bigIntNum.isProbablePrime(100)){
+            return longCheck(bigIntNum);
         }
         return false;
+//        if (!isNumeric(num)){
+//            if(fastCheckNotPrime(num)){
+//                return false;
+//            }
+//            BigInteger bigIntNum = new BigInteger(num);
+//            if(bigIntNum.isProbablePrime(1000000)){
+//                return longCheck(bigIntNum);
+//            }
+//        }
+//        return false;
     }
 
     private boolean isNumeric(String num){
@@ -60,7 +67,7 @@ public class PrimeNumberChecker {
      * @param num
      * @return
      */
-    private boolean fastCheck(String num){
+    private boolean fastCheckNotPrime(String num){
         return num.endsWith("0") ||
                 num.endsWith("2") ||
                 num.endsWith("4") ||
@@ -90,7 +97,6 @@ public class PrimeNumberChecker {
             return false;
         }
         BigInteger bound = num.sqrt();
-        long startMillis = System.currentTimeMillis();
 
         BigInteger thirtyOne = BigInteger.valueOf(31L);
         BigInteger thirtySeven = BigInteger.valueOf(37L);
@@ -122,7 +128,6 @@ public class PrimeNumberChecker {
             fiftyNine = fiftyNine.add(THIRTY);
         }
 
-        System.out.println("Checking time: "+ TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis()-startMillis)+" minutes");
         if(thirtyOne.compareTo(bound)<0){
             System.out.println(thirtyOne);
             System.out.println(bound);

@@ -19,4 +19,8 @@ public interface TaskRepository extends JpaRepository<Task,Long> {
 
     @Query("SELECT t FROM Task t LEFT JOIN FETCH t.user WHERE t.id = :id")
     Optional<Task> getFullTaskById(@Param("id") long id);
+
+    @Query(nativeQuery = true,
+            value = "SELECT * FROM tasks WHERE num = :num AND result IS NOT NULL LIMIT 1")
+    Optional<Task> findPerformedTaskByNum(@Param("num") String num);
 }
