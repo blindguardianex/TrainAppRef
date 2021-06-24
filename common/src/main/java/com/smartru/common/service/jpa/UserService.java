@@ -11,4 +11,5 @@ public interface UserService {
     User add(User user) throws EntityAlreadyExists;
     Optional<User> getByUsername(String login);
     User update(User user);
+    void updateTokens(User user);
 }

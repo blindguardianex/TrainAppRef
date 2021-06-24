@@ -2,6 +2,7 @@ package com.smartru.jpa.service;
 
 import com.smartru.common.entity.BaseEntity;
 import com.smartru.common.entity.Task;
+import com.smartru.common.entity.TaskResult;
 import com.smartru.common.service.jpa.TaskResultService;
 import com.smartru.common.service.jpa.TaskService;
 import com.smartru.jpa.repository.TaskRepository;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -22,6 +24,8 @@ public class TaskServiceJpaImpl implements TaskService {
 
     @Autowired
     private TaskRepository taskRepository;
+    @Autowired
+    private TaskResultService taskResultService;
 
     @Override
     public Task add(Task task) {
@@ -74,5 +78,12 @@ public class TaskServiceJpaImpl implements TaskService {
     public Optional<Task> getByNum(String num) {
         Optional<Task>task = taskRepository.findPerformedTaskByNum(num);
         return task;
+    }
+
+    @Override
+    public void updateResult(Task task) {
+        taskResultService.add(task.getResult());
+        taskRepository.setResult(task.getResult(),task.getId());
+        log.info("JPA IN updateResult - task #{} result successfully updated in database",task.getId());
     }
 }

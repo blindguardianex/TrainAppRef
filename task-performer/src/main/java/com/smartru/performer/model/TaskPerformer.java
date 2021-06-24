@@ -32,10 +32,7 @@ public class TaskPerformer {
             return;
         }
         boolean result = numberChecker.isPrimeNumber(task.getNum());
-        TaskResult taskResult = new TaskResult(task, result);
-        task.setResult(taskResult);
-        taskService.update(task);
-        log.info("Task #{} is complete!", task.getId());
+        finishTask(task, result);
     }
 
     public boolean findPerformedTaskInDatabase(Task task){
@@ -45,12 +42,16 @@ public class TaskPerformer {
         Optional<Task> optTask = taskService.getByNum(task.getNum());
         if (optTask.isEmpty()){
             return false;
+        } else {
+            finishTask(task, optTask.get().getResult().isPrime());
+            return true;
         }
-        TaskResult result = new TaskResult(task,
-                                            optTask.get().getResult().isPrime());
-        task.setResult(result);
-        taskService.update(task);
+    }
+
+    private void finishTask(Task task, boolean result){
+        TaskResult taskResult = new TaskResult(task, result);
+        task.setResult(taskResult);
+        taskService.updateResult(task);
         log.info("Task #{} is complete!", task.getId());
-        return true;
     }
 }

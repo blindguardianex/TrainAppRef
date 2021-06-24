@@ -2,6 +2,7 @@ package com.smartru.hibernate.service;
 
 import com.smartru.common.entity.BaseEntity;
 import com.smartru.common.entity.Task;
+import com.smartru.common.entity.TaskResult;
 import com.smartru.common.service.jpa.TaskResultService;
 import com.smartru.common.service.jpa.TaskService;
 import com.smartru.hibernate.DAO.impl.TaskDAO;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -22,6 +24,8 @@ public class TaskServiceHibernateImpl implements TaskService {
 
     @Autowired
     private TaskDAO taskRepository;
+    @Autowired
+    private TaskResultService taskResultService;
 
     @Override
     public Task add(Task task) {
@@ -68,5 +72,11 @@ public class TaskServiceHibernateImpl implements TaskService {
     @Override
     public Optional<Task> getByNum(String num) {
         return taskRepository.findPerformedTaskByNum(num);
+    }
+
+    @Override
+    public void updateResult(Task task) {
+        taskRepository.setResult(task);
+        log.info("HIBERNATE IN updateResult - task #{} result successfully updated in database",task.getId());
     }
 }

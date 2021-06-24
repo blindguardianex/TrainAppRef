@@ -2,6 +2,7 @@ package com.smartru.hibernate.DAO.impl;
 
 import com.smartru.common.entity.BaseEntity;
 import com.smartru.common.entity.Task;
+import com.smartru.common.entity.TaskResult;
 import com.smartru.common.entity.User;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
@@ -12,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.NoResultException;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -111,6 +109,26 @@ public class TaskDAO extends GenericDAOImpl<Task, Long>{
             return Optional.of(task);
         } catch (NoResultException ex){
             return Optional.empty();
+        }
+    }
+
+    public void setResult(Task task){
+        try(Session session = sessionFactory.openSession()){
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaUpdate<Task> criteriaUpdate = cb.createCriteriaUpdate(Task.class);
+            Root<Task>root = criteriaUpdate.from(Task.class);
+
+            Query setResultQuery = session.createQuery(
+                    criteriaUpdate.set("result", task.getResult())
+                            .where(cb.equal(
+                                    root.get("id"),
+                                    cb.parameter(Long.class, "taskId")))
+            ).setParameter("taskId", task.getId());
+
+            Transaction transaction = session.beginTransaction();
+            session.persist(task.getResult());
+            setResultQuery.executeUpdate();
+            transaction.commit();
         }
     }
 }

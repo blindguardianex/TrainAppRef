@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 
 @Slf4j
@@ -56,5 +57,11 @@ public class UserServiceHibernateImpl implements UserService {
         }
         log.warn("HIBERNATE IN update - user: {} is absent", user.getLogin());
         throw new EntityNotFoundException("User is absent");
+    }
+
+    @Override
+    public void updateTokens(User user) {
+        userRepository.onlyTokensUpdate(user);
+        log.info("HIBERNATE IN updateTokens - user tokens: {} successfully updated in database",user.getLogin());
     }
 }

@@ -12,7 +12,7 @@ import scala.util.Random
 class FullTest extends Simulation{
 
   val httpConf = http
-    .baseUrl("http://localhost:8083/api")
+    .baseUrl("http://10.10.110.193:8083/api")
     .acceptHeader("application/json, */*")
     .doNotTrackHeader("1")
     .acceptLanguageHeader("en-US,en;q=0.5")
@@ -44,7 +44,7 @@ class FullTest extends Simulation{
 
   def randomDef() = Random.nextLong(Long.MaxValue)
 
-  val postTask = repeat(3)(
+  val postTask = repeat(50)(
       exec(
         http("Post task")
           .post("/tasks")
@@ -60,8 +60,8 @@ class FullTest extends Simulation{
     })
 
   setUp(
-    scn.inject(constantUsersPerSec(44) during(1 minutes))
+//    scn.inject(constantUsersPerSec(44) during(1 minutes))
 //    scn.inject(atOnceUsers(120))
-//    scn.inject(rampUsers(2500) during(1 minutes))
+    scn.inject(rampUsers(2000) during(1 minutes))
   ).protocols(httpConf)
 }

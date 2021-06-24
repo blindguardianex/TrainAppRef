@@ -9,9 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -53,5 +55,13 @@ public class UserServiceJpaImpl implements UserService {
         }
         log.warn("JPA IN update - user: {} is absent", user.getLogin());
         throw new EntityNotFoundException("User is absent");
+    }
+
+    @Override
+    public void updateTokens(User user) {
+        repository.onlyTokensUpdate(user.getId(),
+                                        user.getAccessToken(),
+                                        user.getRefreshToken());
+        log.info("JPA IN updateTokens - user tokens: {} successfully updated in database",user.getLogin());
     }
 }

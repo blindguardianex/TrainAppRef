@@ -170,7 +170,7 @@ public class JwtTokenProvider {
         try {
             user.setAccessToken(accessToken);
             user.setRefreshToken(refreshToken);
-            userService.update(user);
+            userService.updateTokens(user);
 
             redis.addToken(String.valueOf(user.getId()), accessToken);
         } catch (JedisConnectionException e){

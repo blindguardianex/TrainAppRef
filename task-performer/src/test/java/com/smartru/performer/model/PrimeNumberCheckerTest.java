@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringJUnitConfig
 class PrimeNumberCheckerTest {
 
-    private static final String CHECKED_NUM = "909090909090909091";
+    private static final String CHECKED_NUM = "2305843009213693951";
 
     @Test
     void isPrimeNumber() {

@@ -46,16 +46,6 @@ public class PrimeNumberChecker {
             return longCheck(bigIntNum);
         }
         return false;
-//        if (!isNumeric(num)){
-//            if(fastCheckNotPrime(num)){
-//                return false;
-//            }
-//            BigInteger bigIntNum = new BigInteger(num);
-//            if(bigIntNum.isProbablePrime(1000000)){
-//                return longCheck(bigIntNum);
-//            }
-//        }
-//        return false;
     }
 
     private boolean isNumeric(String num){
