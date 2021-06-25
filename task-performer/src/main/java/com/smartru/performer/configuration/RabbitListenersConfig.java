@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableRabbit
-public class RabbitConfig{
+public class RabbitListenersConfig {
 
     @Value("${spring.rabbitmq.username}")
     private String login;
@@ -34,10 +34,10 @@ public class RabbitConfig{
     @Value("${spring.rabbitmq.listener.simple.stop-consumer-min-interval}")
     private long stopConsumerMinInterval;
 
-    @Bean
-    public MessageConverter messageConverter(){
-        return new Jackson2JsonMessageConverter();
-    }
+//    @Bean
+//    public MessageConverter messageConverter(){
+//        return new Jackson2JsonMessageConverter();
+//    }
 
     @Bean
     public ConnectionFactory connectionFactory(){
@@ -50,7 +50,7 @@ public class RabbitConfig{
     }
 
     @Bean
-    public RabbitListenerContainerFactory<?> rabbitListenerContainerFactory(ConnectionFactory connectionFactory){
+    public RabbitListenerContainerFactory<?> rabbitListenerContainerFactory(ConnectionFactory connectionFactory, MessageConverter converter){
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         factory.setPrefetchCount(prefetchCount);
@@ -58,7 +58,7 @@ public class RabbitConfig{
         factory.setMaxConcurrentConsumers(maxConcurrentConsumers);
         factory.setStartConsumerMinInterval(startConsumerMinInterval);
         factory.setStopConsumerMinInterval(stopConsumerMinInterval);
-        factory.setMessageConverter(messageConverter());
+        factory.setMessageConverter(converter);
         return factory;
     }
 }

@@ -1,6 +1,7 @@
-package com.smartru.performer.model;
+package com.smartru.performer.rabbit;
 
 import com.smartru.common.entity.Task;
+import com.smartru.performer.model.TaskPerformer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -17,6 +18,6 @@ public class TaskRabbitListener {
 
     @RabbitHandler
     public void receiveTask(Task task){
-        performer.perform(task);
+        performer.performTask(task);
     }
 }

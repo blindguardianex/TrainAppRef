@@ -17,13 +17,13 @@ public class DelegatePrimeNumberChecker {
     @Autowired
     private LongPrimeNumberChecker longChecker;
 
+    @Deprecated
     public boolean isPrimeNumber(String num){
         if (num.length()<MAX_DIGITS_IN_LONG){
             long longNum = Long.parseLong(num);
             return longChecker.isPrimeNumber(longNum);
         } else {
-            BigInteger bigNum = new BigInteger(num);
-            return bigIntChecker.isPrimeNumber(bigNum);
+            return bigIntChecker.isPrimeNumber(num);
         }
     }
 }
