@@ -18,6 +18,7 @@ public class TaskRabbitListener {
 
     @RabbitHandler
     public void receiveTask(Task task){
+        log.info("Getting task #{} from http", task.getId());
         performer.performTask(task);
     }
 }

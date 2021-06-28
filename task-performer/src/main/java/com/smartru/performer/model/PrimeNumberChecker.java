@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 @Deprecated
+// Используйте DelegatePrimeNumberChecker
 public class PrimeNumberChecker {
 
     /** Паттерн для проверки переданного числа */

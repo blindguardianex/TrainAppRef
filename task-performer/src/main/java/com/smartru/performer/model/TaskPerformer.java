@@ -33,7 +33,6 @@ public class TaskPerformer {
     }
 
     public TaskResult performTask(Task task){
-        log.info("Task performer getting task #{} from http", task.getId());
         if(numIsBig(task)){
             Optional<Task> optTask = taskService.getByNum(task.getNum());
             if (optTask.isPresent()){
@@ -45,7 +44,6 @@ public class TaskPerformer {
     }
 
     public void performTelegramTask(TelegramTask task){
-        log.info("Task performer getting task #{} from telegram", task.getId());
         task.setResult(performTask(task.getTask()));
         bot.resultReturn(task);
     }

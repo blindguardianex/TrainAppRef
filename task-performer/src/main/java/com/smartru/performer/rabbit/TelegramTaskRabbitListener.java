@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -19,6 +20,7 @@ public class TelegramTaskRabbitListener {
 
     @RabbitHandler
     public void receiveTask(TelegramTask task){
+        log.info("Getting task #{} from telegram", task.getId());
         performer.performTelegramTask(task);
     }
 }

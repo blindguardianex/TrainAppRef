@@ -17,7 +17,6 @@ public class DelegatePrimeNumberChecker {
     @Autowired
     private LongPrimeNumberChecker longChecker;
 
-    @Deprecated
     public boolean isPrimeNumber(String num){
         if (num.length()<MAX_DIGITS_IN_LONG){
             long longNum = Long.parseLong(num);

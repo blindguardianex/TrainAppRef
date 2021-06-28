@@ -5,11 +5,12 @@ import com.smartru.common.entity.TelegramTask;
 import com.smartru.common.entity.User;
 import com.smartru.common.service.jpa.TaskService;
 import com.smartru.common.service.jpa.UserService;
-import com.smartru.common.service.rabbitmq.TaskRabbitService;
-import com.smartru.telegram.PrimeNumberCheckTelegramBot;
+import com.smartru.common.service.rabbitmq.TelegramTaskRabbitService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.IBotCommand;
+import org.telegram.telegrambots.meta.api.methods.ActionType;
+import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
@@ -23,13 +24,16 @@ public class CheckNumberCommand implements IBotCommand {
 
     private final String IDENTIFIER = "check";
     private final String DESCRIPTION = "Проверить число";
-    private final String TASK_PATTERN = "\\A\\d*\\Z";
+    private final String NUMERIC_PATTERN = "\\A\\d*\\Z";
 
     private User TELEGRAM_USER;
     private final TaskService taskService;
-    private final TaskRabbitService taskRabbitService;
+    private final TelegramTaskRabbitService taskRabbitService;
 
-    public CheckNumberCommand(UserService userService, TaskService taskService, TaskRabbitService taskRabbitService) {
+    private ThreadLocal<AbsSender>localSender = new ThreadLocal<>();
+    private ThreadLocal<Message>localMessage = new ThreadLocal<>();
+
+    public CheckNumberCommand(UserService userService, TaskService taskService, TelegramTaskRabbitService taskRabbitService) {
         this.taskService = taskService;
         this.taskRabbitService = taskRabbitService;
         initializeTelegramUser(userService);
@@ -47,20 +51,18 @@ public class CheckNumberCommand implements IBotCommand {
 
     @Override
     public void processMessage(AbsSender absSender, Message message, String[] strings) {
+        localSender.set(absSender);
+        localMessage.set(message);
         try {
-            String num = strings[0];
-            SendMessage msg = new SendMessage();
-            msg.setChatId(String.valueOf(message.getChatId()));
-
+            final String num = strings[0];
             if (numIsCorrect(num)){
-                msg.setText("Я отправлю тебе ответ как только полностью проверю число: #"+strings[0]);
-                absSender.execute(msg);
-                TelegramTask task = saveTelegramTask(num, message.getChatId());
-                sendTelegramTask(task);
+                sendDefaultPreAnswer(num);
+                sendTypingEvent();
+
+                TelegramTask task = createTelegramTask(num, message.getChatId());
+                sendTelegramTaskForExecution(task);
             } else {
-                msg.setText("Извини, но я не могу проверить такое число! " +
-                        "Максимальная длина числа: 23 разряда");
-                absSender.execute(msg);
+                sendErrorMessage(num);
             }
         } catch (TelegramApiException e) {
             e.printStackTrace();
@@ -68,22 +70,56 @@ public class CheckNumberCommand implements IBotCommand {
     }
 
     private boolean numIsCorrect(String num){
-        if (num.matches(TASK_PATTERN) && num.length()<24){
-            return true;
-        }
-        else {
-            return false;
+        return messageIsNumeric(num) && !numIsTooLong(num);
+    }
+
+    private void sendDefaultPreAnswer(String num) throws TelegramApiException {
+        if (num.length()>13) {
+            SendMessage msg = new SendMessage(localMessage.get().getChatId().toString(),
+                    "Я отправлю тебе ответ как только полностью проверю число: #" + num);
+            localSender.get().execute(msg);
         }
     }
 
-    private TelegramTask saveTelegramTask(String num, long chatId){
+    private void sendErrorMessage(String num) throws TelegramApiException {
+        if (!messageIsNumeric(num)){
+            SendMessage msg = new SendMessage(localMessage.get().getChatId().toString(),
+                    "Извини, но я работаю только с числами.");
+            localSender.get().execute(msg);
+        } else if (numIsTooLong(num)) {
+            SendMessage msg = new SendMessage(localMessage.get().getChatId().toString(),
+                    "Извини, но я не могу проверить такое число! Максимальная длина числа: 23 разряда");
+            localSender.get().execute(msg);
+        } else {
+            SendMessage msg = new SendMessage(localMessage.get().getChatId().toString(),
+                    "По какой-то причине твое сообщение принято некорректным! Возможно, это гендерное неравенство...");
+            localSender.get().execute(msg);
+        }
+    }
+
+    private TelegramTask createTelegramTask(String num, long chatId){
         Task task = new Task(num);
         task.setUser(TELEGRAM_USER);
         taskService.add(task);
         return new TelegramTask(task,chatId);
     }
 
-    private void sendTelegramTask(TelegramTask task){
+    private void sendTypingEvent() throws TelegramApiException {
+        SendChatAction action = new SendChatAction();
+        action.setChatId(localMessage.get().getChatId().toString());
+        action.setAction(ActionType.TYPING);
+        localSender.get().execute(action);
+    }
+
+    private boolean messageIsNumeric(String message){
+        return message.matches(NUMERIC_PATTERN);
+    }
+
+    private boolean numIsTooLong(String num){
+        return num.length()>23;
+    }
+
+    private void sendTelegramTaskForExecution(TelegramTask task){
         taskRabbitService.sendTelegramTask(task);
     }
 

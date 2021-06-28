@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
-import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -23,15 +22,24 @@ public class PrimeNumberCheckTelegramBot extends TelegramLongPollingCommandBot {
     private String BOT_TOKEN;
     @Autowired
     private NonCommandProcess nonCommand;
+    private CheckNumberCommand checkNumberCommand;
+
+    private final String TASK_PATTERN = "\\A\\d*\\Z";
 
     public PrimeNumberCheckTelegramBot(CheckNumberCommand checkNumberCommand){
+        this.checkNumberCommand =checkNumberCommand;
         register(checkNumberCommand);
     }
 
     @Override
     public void processNonCommandUpdate(Update update) {
         Message msg = update.getMessage();
-        long chatId = msg.getChatId();
+        if (isNumber(msg.getText())){
+            checkNumber(msg);
+            return;
+        }
+
+        Long chatId = msg.getChatId();
         String username = usernameFromMessage(msg);
         String answer = nonCommand.nonCommandExecute(chatId, username, msg.getText());
         try {
@@ -67,15 +75,25 @@ public class PrimeNumberCheckTelegramBot extends TelegramLongPollingCommandBot {
         return BOT_TOKEN;
     }
 
+    private boolean isNumber(String text){
+        return text.matches(TASK_PATTERN);
+    }
+
+    private void checkNumber(Message msg){
+        checkNumberCommand.processMessage(this,
+                msg,
+                new String[]{msg.getText()});
+    }
+
     private String usernameFromMessage(Message msg){
         User user = msg.getFrom();
         String username = user.getUserName();
         return username;
     }
 
-    private void setAnswer(long chatId, String text) throws TelegramApiException {
+    private void setAnswer(Long chatId, String text) throws TelegramApiException {
         SendMessage answer = new SendMessage();
-        answer.setChatId(String.valueOf(chatId));
+        answer.setChatId(chatId.toString());
         answer.setText(text);
         execute(answer);
     }
