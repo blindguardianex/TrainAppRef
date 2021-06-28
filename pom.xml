@@ -13,9 +13,10 @@
         <module>task-receiver</module>
         <module>jpa</module>
         <module>hibernate</module>
-        <module>task-performer</module>
+        <module>task-consumer</module>
         <module>telegram</module>
         <module>rabbitmq</module>
+        <module>performers</module>
     </modules>
 
     <properties>
