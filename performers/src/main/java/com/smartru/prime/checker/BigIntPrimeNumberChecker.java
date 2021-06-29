@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigInteger;
 
 /**
+ * TODO Отрефакторить
  * Данный класс проверяет числа на простоту
  * !!!ВНИМАНИЕ!!!
  * !!!Данный класс некорретно работает с числами меньше 1024!!!
@@ -69,6 +70,7 @@ public class BigIntPrimeNumberChecker {
     }
 
     /**
+     * !!!ВНИМАНИЕ!!! Данный класс неверно проверяет числа, корень из которых меньше 31!!!
      * Проверяются следующие делители: 3, 7, 11, 13, 17, 19, 23, 29. Таким образом
      * (в совокупности с предыдещими проверками) мы отсеяли все числа от 2 до 30 в
      * качестве возможных делителей проверяемого числа.
@@ -119,7 +121,7 @@ public class BigIntPrimeNumberChecker {
             fiftyThree = fiftyThree.add(THIRTY);
             fiftyNine = fiftyNine.add(THIRTY);
         }
-
+        //Условие, изза которого класс некорректно работает с маленькими числами
         if(thirtyOne.compareTo(bound)<0){
             System.out.println(thirtyOne);
             System.out.println(bound);

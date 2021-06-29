@@ -53,7 +53,7 @@ public class TaskReceiverAppLauncher {
             BotStarter telegramBotStarter = (BotStarter) ctx.getBean("telegramBotStarter");
             telegramBotStarter.start();
         }catch (NoSuchBeanDefinitionException ex){
-            log.warn("Starting application without Telegram module!");
+            log.warn("Starting application without Telegram module. Please, include telegram module, if you want perform tasks from telegram!");
         }
     }
 }

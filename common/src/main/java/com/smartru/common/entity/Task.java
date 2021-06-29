@@ -1,18 +1,24 @@
 package com.smartru.common.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 @Data
 @Entity
 @Table(name = "tasks")
+@TypeDef(
+        name = "json",
+        typeClass = JsonStringType.class
+)
 @NoArgsConstructor
 public class Task extends BaseEntity{
 
@@ -31,7 +37,19 @@ public class Task extends BaseEntity{
     @JoinColumn(name = "result")
     private TaskResult result;
 
+    @Type(type = "json")
+    @Column(name = "properties", columnDefinition = "json")
+    private ObjectNode properties;
+
     public Task(String num) {
         this.num = num;
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "num='" + num + '\'' +
+                ", properties='" + properties + '\'' +
+                '}' + super.toString();
     }
 }

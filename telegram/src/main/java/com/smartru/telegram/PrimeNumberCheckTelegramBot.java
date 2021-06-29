@@ -1,5 +1,8 @@
 package com.smartru.telegram;
-import com.smartru.common.entity.TelegramTask;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smartru.common.entity.Task;
 import com.smartru.telegram.commands.CheckNumberCommand;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,7 @@ public class PrimeNumberCheckTelegramBot extends TelegramLongPollingCommandBot {
     @Autowired
     private NonCommandProcess nonCommand;
     private CheckNumberCommand checkNumberCommand;
+    private final ObjectMapper mapper = new ObjectMapper();
 
     private final String TASK_PATTERN = "\\A\\d*\\Z";
 
@@ -37,27 +41,20 @@ public class PrimeNumberCheckTelegramBot extends TelegramLongPollingCommandBot {
         if (isNumber(msg.getText())){
             checkNumber(msg);
             return;
-        }
-
-        Long chatId = msg.getChatId();
-        String username = usernameFromMessage(msg);
-        String answer = nonCommand.nonCommandExecute(chatId, username, msg.getText());
-        try {
-            setAnswer(chatId,answer);
-        } catch (TelegramApiException e) {
-            log.error("Ошибка отправки сообщения пользователю: {}, чат #{}", username, chatId);
+        } else {
+            sendDefaultMessage(msg);
         }
     }
 
-    public void resultReturn(TelegramTask task){
+    public void resultReturn(Task task){
         try {
             SendMessage msg = new SendMessage();
-            msg.setChatId(String.valueOf(task.getChatId()));
+            msg.setChatId(chatIdFromTask(task));
 
             if (task.getResult().isPrime()){
-                msg.setText(String.format("Число %s простое",task.getTask().getNum()));
+                msg.setText(String.format("Число %s простое",task.getNum()));
             } else {
-                msg.setText(String.format("Число %s составное",task.getTask().getNum()));
+                msg.setText(String.format("Число %s составное",task.getNum()));
             }
             execute(msg);
         } catch (TelegramApiException e) {
@@ -85,6 +82,17 @@ public class PrimeNumberCheckTelegramBot extends TelegramLongPollingCommandBot {
                 new String[]{msg.getText()});
     }
 
+    private void sendDefaultMessage(Message msg){
+        Long chatId = msg.getChatId();
+        String username = usernameFromMessage(msg);
+        String answer = nonCommand.nonCommandExecute(chatId, username, msg.getText());
+        try {
+            setAnswer(chatId,answer);
+        } catch (TelegramApiException e) {
+            log.error("Ошибка отправки сообщения пользователю: {}, чат #{}", username, chatId);
+        }
+    }
+
     private String usernameFromMessage(Message msg){
         User user = msg.getFrom();
         String username = user.getUserName();
@@ -96,5 +104,9 @@ public class PrimeNumberCheckTelegramBot extends TelegramLongPollingCommandBot {
         answer.setChatId(chatId.toString());
         answer.setText(text);
         execute(answer);
+    }
+
+    private String chatIdFromTask(Task task){
+        return task.getProperties().get("chatId").asText();
     }
 }

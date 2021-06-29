@@ -8,10 +8,6 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-/**
- * Сущность-результат выполнения Task
- * @see com.smartru.common.entity.Task
- */
 @Data
 @Entity
 @Table(name = "task_results")

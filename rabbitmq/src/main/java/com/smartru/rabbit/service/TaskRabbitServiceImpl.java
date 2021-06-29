@@ -1,7 +1,6 @@
 package com.smartru.rabbit.service;
 
 import com.smartru.common.entity.Task;
-import com.smartru.common.entity.TelegramTask;
 import com.smartru.common.service.rabbitmq.TaskRabbitService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Exchange;
@@ -11,10 +10,12 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@Primary
 public class TaskRabbitServiceImpl implements TaskRabbitService {
 
     @Value("${rabbit.task.routing-key}")

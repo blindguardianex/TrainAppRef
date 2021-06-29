@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 import java.math.BigInteger;
 import java.util.Arrays;
 
+/**
+ * TODO Отрефакторить
+ */
 @Slf4j
 @Component
 public class LongPrimeNumberChecker {

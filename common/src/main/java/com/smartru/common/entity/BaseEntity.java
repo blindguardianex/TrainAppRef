@@ -8,9 +8,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.util.Date;
 
-/**
- * Базовая сущность, включающая общие обязательные поля для всех сущностей
- */
 @MappedSuperclass
 @Data
 @EntityListeners(AuditingEntityListener.class)

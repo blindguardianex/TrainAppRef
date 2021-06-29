@@ -4,9 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-/**
- * Сущность, включающая данные, необходимые для аутентификации пользователя
- */
 @Data
 public class AuthenticationRequestDto {
     private final String username;

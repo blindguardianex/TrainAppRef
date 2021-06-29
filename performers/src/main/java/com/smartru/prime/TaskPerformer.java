@@ -2,7 +2,6 @@ package com.smartru.prime;
 
 import com.smartru.common.entity.Task;
 import com.smartru.common.entity.TaskResult;
-import com.smartru.common.entity.TelegramTask;
 import com.smartru.common.model.Performer;
 import com.smartru.common.service.jpa.TaskService;
 import com.smartru.prime.checker.DelegatePrimeNumberChecker;
@@ -17,7 +16,7 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-@Primary
+@Qualifier("PrimeNumberCheckerPerformer")
 public class TaskPerformer implements Performer {
 
     private final TaskService taskService;

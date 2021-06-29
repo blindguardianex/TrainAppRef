@@ -51,32 +51,13 @@ public class TaskController {
     @GetMapping("/{id}")
     public ResponseEntity<TaskDto> getTask(@PathVariable("id") long taskId, Principal principal){
         Optional<Task> optTask = taskService.getById(taskId);
-//        if (optTask.isPresent()){
-//            Task task = optTask.get();
-//            if (task.getUser().getLogin().equals(principal.getName())) {
-//                if (!task.getStatus().equals(BaseEntity.Status.ACTIVE)){
-//                    log.warn("Trying to get not active task");
-//                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//                }
-//                return new ResponseEntity<>(TaskResultDto.fromTask(task), HttpStatus.OK);
-//            }
-//            else {
-//                log.warn("Trying to get someone else's task by: {}",principal.getName());
-//                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//            }
-//        }
-//        else{
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        }
-
         if (optTask.isEmpty()){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         Task task = optTask.get();
-        if (!task.getUser().getLogin().equals(principal.getName()) ||
-                !task.getStatus().equals(BaseEntity.Status.ACTIVE)){
-                    log.warn("Trying to get someone else's task or not active task by: {}",principal.getName());
-                    return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        if (!userOwnsTask(task, principal.getName()) || !taskIsActive(task)){
+            log.warn("Trying to get someone else's task or not active task by: {}",principal.getName());
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         return new ResponseEntity<>(TaskDto.fromTask(task), HttpStatus.OK);
     }
@@ -94,17 +75,25 @@ public class TaskController {
         Optional<Task> optTask = taskService.getById(taskId);
         if (optTask.isPresent()){
             Task task = optTask.get();
-            if (task.getUser().getLogin().equals(principal.getName())) {
+            if (userOwnsTask(task, principal.getName())) {
                 taskService.setDeletedStatus(task);
                 return new ResponseEntity<>(HttpStatus.OK);
             }
             else {
-                log.warn("Trying to get someone else's task by: {}",principal.getName());
+                log.warn("Trying to delete someone else's task by: {}",principal.getName());
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             }
         }
         else{
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    private boolean userOwnsTask(Task task, String username){
+        return !task.getUser().getLogin().equals(username);
+    }
+
+    private boolean taskIsActive(Task task){
+        return task.getStatus().equals(BaseEntity.Status.ACTIVE);
     }
 }

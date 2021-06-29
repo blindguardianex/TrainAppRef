@@ -16,11 +16,15 @@ public class DelegatePrimeNumberChecker {
     private LongPrimeNumberChecker longChecker;
 
     public boolean isPrimeNumber(String num){
-        if (num.length()<MAX_DIGITS_IN_LONG){
+        if (numIsTooLarge(num)){
+            return bigIntChecker.isPrimeNumber(num);
+        } else {
             long longNum = Long.parseLong(num);
             return longChecker.isPrimeNumber(longNum);
-        } else {
-            return bigIntChecker.isPrimeNumber(num);
         }
+    }
+
+    private boolean numIsTooLarge(String num){
+        return num.length()<MAX_DIGITS_IN_LONG;
     }
 }

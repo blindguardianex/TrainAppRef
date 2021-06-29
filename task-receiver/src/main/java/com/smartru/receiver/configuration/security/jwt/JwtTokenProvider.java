@@ -93,7 +93,7 @@ public class JwtTokenProvider {
         }
     }
 
-    public String resolveToken(HttpServletRequest req){
+    public String tokenFromRequest(HttpServletRequest req){
         String bearerToken = req.getHeader("Authorization");
         if (bearerToken!=null&&bearerToken.startsWith("Bearer ")){
             return bearerToken.substring(7);
@@ -101,7 +101,7 @@ public class JwtTokenProvider {
         return null;
     }
 
-    public boolean validateAccessToken(String token){
+    public boolean accessTokenIsValid(String token){
         try {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
             if (claims.getBody().getExpiration().before(new Date())) {

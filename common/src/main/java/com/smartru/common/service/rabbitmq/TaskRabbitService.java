@@ -2,7 +2,6 @@ package com.smartru.common.service.rabbitmq;
 
 
 import com.smartru.common.entity.Task;
-import com.smartru.common.entity.TelegramTask;
 
 public interface TaskRabbitService {
 
