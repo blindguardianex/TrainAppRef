@@ -29,15 +29,13 @@ public class AuthenticationController {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
-    private final RegistrationProvider registrationProvider;
 
     @Autowired
     public AuthenticationController(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager,
-                                    UserService userService, RegistrationProvider registrationProvider) {
+                                    UserService userService) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
         this.userService = userService;
-        this.registrationProvider = registrationProvider;
     }
 
     @PostMapping("sign")
@@ -50,6 +48,13 @@ public class AuthenticationController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * TODO: Для правильной работы метода перед токеном надо добавить "Bearer_" вместо "Bearer "
+     * TODO: Надо исправить
+     * @param refreshToken
+     * @param expiredToken
+     * @return
+     */
     @PostMapping("refresh_token")
     public ResponseEntity refreshToken(@CookieValue(value = "Refresh_Token") String refreshToken,
                                        @CookieValue(value = "Expired_Token") String expiredToken){
@@ -59,18 +64,6 @@ public class AuthenticationController {
             return ResponseEntity.ok(response);
         } catch (UsernameNotFoundException | JwtException ex) {
             log.error("Incorrect refresh token");
-            return new ResponseEntity(HttpStatus.FORBIDDEN);
-        }
-    }
-
-    @PostMapping("signUp")
-    public ResponseEntity registration(@Valid @RequestBody RegistrationRequestDto registrationRequest){
-        try {
-            log.info("Registration new user: {}", registrationRequest.getUsername());
-            registrationProvider.registry(registrationRequest.toUser());
-            log.info("Successful registration user: {}", registrationRequest.getUsername());
-            return new ResponseEntity(HttpStatus.OK);
-        } catch (EntityAlreadyExists ex) {
             return new ResponseEntity(HttpStatus.FORBIDDEN);
         }
     }

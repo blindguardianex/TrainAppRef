@@ -21,15 +21,6 @@ public class RegistrationProvider {
     @Autowired
     private PasswordEncoder encoder;
 
-    private static final String DEFAULT_ROLE = "ROLE_EXTERNAL";
-
-    /**
-     * NotFoundException вылетает, если приложение не находит дефолтную роль в базе данных. В
-     * этом влуче продолжать работы программы нет смысла.
-     * @param user
-     * @return
-     * @throws BadAttributeValueExpException
-     */
     public User registry(User user) throws EntityAlreadyExists {
         try {
             user.setPassword(encoder.encode(user.getPassword()));

@@ -14,6 +14,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+/**
+ * TODO: Убрать зависимоть от taskService(???)
+ */
 @Slf4j
 @Component
 @Qualifier("PrimeNumberCheckerPerformer")

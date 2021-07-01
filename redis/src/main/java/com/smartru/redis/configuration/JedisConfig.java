@@ -1,4 +1,4 @@
-package com.smartru.receiver.configuration;
+package com.smartru.redis.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

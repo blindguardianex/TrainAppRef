@@ -17,6 +17,7 @@
         <module>telegram</module>
         <module>rabbitmq</module>
         <module>performers</module>
+        <module>redis</module>
     </modules>
 
     <properties>

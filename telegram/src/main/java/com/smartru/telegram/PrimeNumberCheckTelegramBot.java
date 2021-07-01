@@ -1,8 +1,7 @@
 package com.smartru.telegram;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartru.common.entity.Task;
+import com.smartru.common.entity.TaskResult;
 import com.smartru.telegram.commands.CheckNumberCommand;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +39,6 @@ public class PrimeNumberCheckTelegramBot extends TelegramLongPollingCommandBot {
         Message msg = update.getMessage();
         if (isNumber(msg.getText())){
             checkNumber(msg);
-            return;
         } else {
             sendDefaultMessage(msg);
         }
@@ -49,13 +47,8 @@ public class PrimeNumberCheckTelegramBot extends TelegramLongPollingCommandBot {
     public void resultReturn(Task task){
         try {
             SendMessage msg = new SendMessage();
-            msg.setChatId(chatIdFromTask(task));
-
-            if (task.getResult().isPrime()){
-                msg.setText(String.format("Число %s простое",task.getNum()));
-            } else {
-                msg.setText(String.format("Число %s составное",task.getNum()));
-            }
+            msg.setChatId(getChatIdFromTask(task));
+            msg.setText(createResponseByResult(task));
             execute(msg);
         } catch (TelegramApiException e) {
             e.printStackTrace();
@@ -93,6 +86,14 @@ public class PrimeNumberCheckTelegramBot extends TelegramLongPollingCommandBot {
         }
     }
 
+    private String createResponseByResult(Task task){
+        if (task.getResult().isPrime()){
+            return String.format("Число %s простое",task.getNum());
+        } else {
+            return String.format("Число %s составное",task.getNum());
+        }
+    }
+
     private String usernameFromMessage(Message msg){
         User user = msg.getFrom();
         String username = user.getUserName();
@@ -106,7 +107,7 @@ public class PrimeNumberCheckTelegramBot extends TelegramLongPollingCommandBot {
         execute(answer);
     }
 
-    private String chatIdFromTask(Task task){
+    private String getChatIdFromTask(Task task){
         return task.getProperties().get("chatId").asText();
     }
 }

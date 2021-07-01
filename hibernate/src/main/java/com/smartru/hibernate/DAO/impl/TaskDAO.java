@@ -57,7 +57,7 @@ public class TaskDAO extends GenericDAOImpl<Task, Long>{
         }
     }
 
-    public Optional<Task> getFullTaskById(long id){
+    public Optional<Task> findFullTaskById(long id){
         try (Session session = sessionFactory.openSession()){
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<Task> criteriaQuery = cb.createQuery(Task.class);

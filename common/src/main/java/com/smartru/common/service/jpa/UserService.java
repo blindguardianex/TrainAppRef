@@ -12,4 +12,8 @@ public interface UserService {
     Optional<User> getByUsername(String login);
     User update(User user);
     void updateTokens(User user);
+
+    default boolean isReady(){
+        return true;
+    }
 }

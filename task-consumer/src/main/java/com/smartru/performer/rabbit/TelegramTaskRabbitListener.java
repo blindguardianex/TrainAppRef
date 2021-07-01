@@ -1,8 +1,5 @@
 package com.smartru.performer.rabbit;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartru.common.entity.Task;
 import com.smartru.common.exceptions.TelegramModuleNotInclude;
 import com.smartru.common.model.OuterPerformer;
@@ -21,8 +18,7 @@ public class TelegramTaskRabbitListener {
     @Autowired(required = false)
     @Qualifier("telegramPrimeNumberCheckerPerformer")
     private OuterPerformer performer;
-    private ObjectMapper mapper = new ObjectMapper();
-    private final String TASK_TYPE = "telegram";
+    private final String TASK_TYPE = Task.Type.TELEGRAM.toString();
 
     @RabbitHandler
     public void receiveTask(Task task){
@@ -32,12 +28,8 @@ public class TelegramTaskRabbitListener {
             performer.perform(task);
         }
         else {
-            log.error("Incorrect task type (not telegram)! Task #{}", task.getId());
+            log.error("Incorrect task type (not telegram) in telegram task queue! Task #{}", task.getId());
         }
-    }
-
-    private boolean taskHasTelegramType(Task task){
-        return TASK_TYPE.equals(task.getProperties().get("type").asText());
     }
 
     private void checkTelegramModuleConnection(){
@@ -45,5 +37,9 @@ public class TelegramTaskRabbitListener {
             log.error("Please, include telegram module, if you want perform tasks from telegram!");
             throw new TelegramModuleNotInclude();
         }
+    }
+
+    private boolean taskHasTelegramType(Task task){
+        return TASK_TYPE.equals(task.getProperties().get("type").asText());
     }
 }

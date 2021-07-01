@@ -2,7 +2,6 @@ package com.smartru.hibernate.service;
 
 import com.smartru.common.entity.BaseEntity;
 import com.smartru.common.entity.Task;
-import com.smartru.common.entity.TaskResult;
 import com.smartru.common.service.jpa.TaskResultService;
 import com.smartru.common.service.jpa.TaskService;
 import com.smartru.hibernate.DAO.impl.TaskDAO;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -50,7 +48,7 @@ public class TaskServiceHibernateImpl implements TaskService {
 
     @Override
     public Optional<Task> getById(long id) {
-        Optional<Task> task = taskRepository.getFullTaskById(id);
+        Optional<Task> task = taskRepository.findFullTaskById(id);
         if(task.isPresent()){
             log.info("HIBERNATE IN getById - by id #{} find task", id);
         } else {

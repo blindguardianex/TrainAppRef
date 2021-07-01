@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import java.math.BigInteger;
 
 /**
- * TODO Отрефакторить
  * Данный класс проверяет числа на простоту
  * !!!ВНИМАНИЕ!!!
  * !!!Данный класс некорретно работает с числами меньше 1024!!!
@@ -14,12 +13,12 @@ import java.math.BigInteger;
  *  1) Возвращает false, если переданная строка не является числом
  * @see BigIntPrimeNumberChecker#isNumeric(String)
  *  2) Возвращает false, если число делится на 2 или 5
- * @see BigIntPrimeNumberChecker#fastCheckNotPrime(String)
+ * @see BigIntPrimeNumberChecker#quickCheckForProbablePrime(String)
  *  3) Возвращает false, если не пройдена проверка тестом Миллера-Рабина
  * @see BigInteger#isProbablePrime(int)
  *  4) В случае, если проверка Миллера-Рабина пройдена успешно, проходит тест,
  *  удостоверяющий простоту числа
- * @see BigIntPrimeNumberChecker#longCheck(BigInteger)
+ * @see BigIntPrimeNumberChecker#trueTestForPrime(BigInteger)
  */
 
 @Slf4j
@@ -41,12 +40,11 @@ public class BigIntPrimeNumberChecker {
     private final BigInteger THIRTY = BigInteger.valueOf(30L);
 
     public boolean isPrimeNumber(String num){
-        if (!isNumeric(num) || fastCheckNotPrime(num)) {
-            return false;
-        }
-        BigInteger bigIntNum = new BigInteger(num);
-        if(bigIntNum.isProbablePrime(100)){
-            return longCheck(bigIntNum);
+        if (isNumeric(num) && quickCheckForProbablePrime(num)) {
+            BigInteger bigIntNum = new BigInteger(num);
+            if (bigIntNum.isProbablePrime(100)) {
+                return trueTestForPrime(bigIntNum);
+            }
         }
         return false;
     }
@@ -60,13 +58,13 @@ public class BigIntPrimeNumberChecker {
      * @param num
      * @return
      */
-    private boolean fastCheckNotPrime(String num){
-        return num.endsWith("0") ||
+    private boolean quickCheckForProbablePrime(String num){
+        return !(num.endsWith("0") ||
                 num.endsWith("2") ||
                 num.endsWith("4") ||
                 num.endsWith("5") ||
                 num.endsWith("6") ||
-                num.endsWith("8");
+                num.endsWith("8"));
     }
 
     /**
@@ -84,7 +82,7 @@ public class BigIntPrimeNumberChecker {
      * @param num
      * @return
      */
-    private boolean longCheck(BigInteger num){
+    private boolean trueTestForPrime(BigInteger num){
         log.info("Maybe num #{} is prime number...", num);
         if (findDivisorsBefore30(num)){
             System.out.println("EZ");

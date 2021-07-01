@@ -25,6 +25,6 @@ public class DelegatePrimeNumberChecker {
     }
 
     private boolean numIsTooLarge(String num){
-        return num.length()<MAX_DIGITS_IN_LONG;
+        return num.length()>=MAX_DIGITS_IN_LONG;
     }
 }

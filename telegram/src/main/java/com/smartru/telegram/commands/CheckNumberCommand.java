@@ -6,8 +6,9 @@ import com.smartru.common.entity.Task;
 import com.smartru.common.entity.User;
 import com.smartru.common.service.jpa.TaskService;
 import com.smartru.common.service.jpa.UserService;
-import com.smartru.common.service.rabbitmq.TaskRabbitService;
+import com.smartru.common.service.messagebroker.TaskBrokerService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.IBotCommand;
@@ -30,17 +31,20 @@ public class CheckNumberCommand implements IBotCommand {
 
     private User TELEGRAM_USER;
     private final TaskService taskService;
-    private final TaskRabbitService taskRabbitService;
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final TaskBrokerService taskBrokerService;
+    private final ObjectMapper mapper;
 
     private ThreadLocal<AbsSender>localSender = new ThreadLocal<>();
     private ThreadLocal<Message>localMessage = new ThreadLocal<>();
 
+    @Autowired
     public CheckNumberCommand(UserService userService,
                               TaskService taskService,
-                              @Qualifier("telegramTaskRabbitService") TaskRabbitService taskRabbitService) {
+                              @Qualifier("telegramTaskRabbitService") TaskBrokerService taskBrokerService,
+                              ObjectMapper mapper) {
         this.taskService = taskService;
-        this.taskRabbitService = taskRabbitService;
+        this.taskBrokerService = taskBrokerService;
+        this.mapper = mapper;
         initializeTelegramUser(userService);
     }
 
@@ -129,7 +133,7 @@ public class CheckNumberCommand implements IBotCommand {
     }
 
     private void sendTelegramTaskForExecution(Task task){
-        taskRabbitService.sendTask(task);
+        taskBrokerService.sendTask(task);
     }
 
     private void initializeTelegramUser(UserService service){
@@ -139,7 +143,7 @@ public class CheckNumberCommand implements IBotCommand {
 
     private ObjectNode createTaskProperties(long chatId){
         ObjectNode properties = mapper.createObjectNode();
-        properties.put("type", "telegram");
+        properties.put("type", Task.Type.TELEGRAM.toString());
         properties.put("chatId", chatId);
         return properties;
     }

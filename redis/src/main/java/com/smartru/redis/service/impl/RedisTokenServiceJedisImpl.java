@@ -1,8 +1,9 @@
-package com.smartru.receiver.service.redis;
+package com.smartru.redis.service.impl;
 
-import com.smartru.common.service.redis.RedisTokenService;
+import com.smartru.redis.service.RedisTokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
@@ -11,14 +12,15 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 
 @Slf4j
 @Service
-public class RedisTokenServiceImpl implements RedisTokenService {
+@Qualifier("redisTokenServiceJedisImpl")
+public class RedisTokenServiceJedisImpl implements RedisTokenService {
 
-    @Value("${jedis.keyvalid}")
-    private long keyValidTime;
+    @Value("${jedis.key-valid.time}")
+    private int keyValidTime;
     private final JedisPool jedisPool;
 
     @Autowired
-    public RedisTokenServiceImpl(JedisPool jedisPool) {
+    public RedisTokenServiceJedisImpl(JedisPool jedisPool) {
         this.jedisPool = jedisPool;
     }
 

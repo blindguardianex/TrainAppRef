@@ -2,10 +2,11 @@ package com.smartru.receiver.configuration.security.jwt;
 
 import com.smartru.common.entity.User;
 import com.smartru.common.service.jpa.UserService;
-import com.smartru.common.service.redis.RedisTokenService;
+import com.smartru.common.service.redis.TokenService;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,13 +31,13 @@ public class JwtTokenProvider {
     @Value("${token.access.expired}")
     private long sessionTime;
 
-    private final RedisTokenService redis;
+    private final TokenService tokenService;
     private final UserService userService;
 
     @Autowired
-    public JwtTokenProvider(RedisTokenService redis,
+    public JwtTokenProvider(@Qualifier("redisTokenServiceJedisImpl") TokenService tokenService,
                             UserService userService) {
-        this.redis = redis;
+        this.tokenService = tokenService;
         this.userService = userService;
     }
 
@@ -101,7 +102,7 @@ public class JwtTokenProvider {
         return null;
     }
 
-    public boolean accessTokenIsValid(String token){
+    public boolean validateAccessToken(String token){
         try {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
             if (claims.getBody().getExpiration().before(new Date())) {
@@ -151,7 +152,7 @@ public class JwtTokenProvider {
     }
 
     private boolean checkTokenInRedis(String token){
-            if (!redis.tokenExists(token)) {
+            if (!tokenService.tokenExists(token)) {
                 log.error("Access token is not found");
                 return false;
             }
@@ -172,7 +173,7 @@ public class JwtTokenProvider {
             user.setRefreshToken(refreshToken);
             userService.updateTokens(user);
 
-            redis.addToken(String.valueOf(user.getId()), accessToken);
+            tokenService.addToken(String.valueOf(user.getId()), accessToken);
         } catch (JedisConnectionException e){
             log.error("Server redis does not respond! Saving only mysql db");
         }

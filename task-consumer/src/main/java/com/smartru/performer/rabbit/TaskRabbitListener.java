@@ -18,10 +18,21 @@ public class TaskRabbitListener {
     @Autowired
     @Qualifier("PrimeNumberCheckerPerformer")
     private Performer performer;
+    private final String TASK_TYPE = Task.Type.HTTP.toString();
 
     @RabbitHandler
     public void receiveTask(Task task){
         log.info("Getting task #{} from http", task.getId());
-        performer.perform(task);
+        if (taskHasHttpType(task)) {
+            log.info("Getting task #{} from telegram", task.getId());
+            performer.perform(task);
+        }
+        else {
+            log.error("Incorrect task type (not http) in http task queue! Task #{}", task.getId());
+        }
+    }
+
+    private boolean taskHasHttpType(Task task){
+        return TASK_TYPE.equals(task.getProperties().get("type").asText());
     }
 }

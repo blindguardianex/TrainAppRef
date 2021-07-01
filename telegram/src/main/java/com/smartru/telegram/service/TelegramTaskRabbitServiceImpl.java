@@ -1,7 +1,7 @@
 package com.smartru.telegram.service;
 
 import com.smartru.common.entity.Task;
-import com.smartru.common.service.rabbitmq.TaskRabbitService;
+import com.smartru.rabbit.service.TaskRabbitService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.Message;
@@ -13,10 +13,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+/**
+ * TODO: Можно добавить в основной интерфейс в метод sendTask(Task) параметр String routingKey
+ * TODO: и тогда можно обойтись без этого класса. Но тогда отправляющие классы должны будут
+ * TODO: знать про ключи. Но если реализация не подразумевает использование rabbitmq? Поэтому отказался от этой идеи
+ */
 @Slf4j
 @Service
 @Qualifier("telegramTaskRabbitService")
 public class TelegramTaskRabbitServiceImpl implements TaskRabbitService {
+
     @Value("${rabbit.task.telegram.routing-key}")
     private String telegramTaskRoutingKey;
 

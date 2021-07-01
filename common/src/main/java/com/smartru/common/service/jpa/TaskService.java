@@ -15,4 +15,8 @@ public interface TaskService {
     void setDeletedStatus(Task task);
     Optional<Task> getByNum(String num);
     void updateResult(Task task);
+
+    default boolean isReady(){
+        return true;
+    }
 }

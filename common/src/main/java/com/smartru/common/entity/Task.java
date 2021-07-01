@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
@@ -37,7 +36,7 @@ public class Task extends BaseEntity{
     @JoinColumn(name = "result")
     private TaskResult result;
 
-    @Type(type = "json")
+    @org.hibernate.annotations.Type(type = "json")
     @Column(name = "properties", columnDefinition = "json")
     private ObjectNode properties;
 
@@ -51,5 +50,21 @@ public class Task extends BaseEntity{
                 "num='" + num + '\'' +
                 ", properties='" + properties + '\'' +
                 '}' + super.toString();
+    }
+
+    public static enum Type {
+        HTTP("http"),
+        TELEGRAM("telegram");
+
+        private final String type;
+
+        private Type(String type){
+            this.type=type;
+        }
+
+        @Override
+        public String toString() {
+            return type;
+        }
     }
 }

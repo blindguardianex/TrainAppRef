@@ -1,6 +1,6 @@
 package com.smartru.common.service.redis;
 
-public interface RedisTokenService extends RedisCheckTokenService{
+public interface TokenService extends CheckTokenService{
 
     void addToken(String userId, String token);
 }

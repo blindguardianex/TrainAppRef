@@ -22,7 +22,7 @@ public class HibernateConfiguration {
     @Value("${spring.jpa.database-platform}")
     private String hibernateDialect;
     @Value("${spring.jpa.show-sql}")
-    private String hibernateShowSql;
+    private String hibernateIsShowSql;
 
     @Bean
     public SessionFactory sessionFactory(MetadataSources metadataSources){
@@ -38,7 +38,7 @@ public class HibernateConfiguration {
                 .applySetting("hibernate.connection.password", databasePassword)
                 .applySetting("hibernate.connection.driver_class", databaseDriver)
                 .applySetting("hibernate.dialect",hibernateDialect)
-                .applySetting("hibernate.show_sql", hibernateShowSql);
+                .applySetting("hibernate.show_sql", hibernateIsShowSql);
 
         return serviceRegistryBuilder.build();
     }

@@ -6,4 +6,7 @@ import com.smartru.common.entity.TaskResult;
 public interface TaskResultService {
 
     TaskResult add(TaskResult result);
+    default boolean isReady(){
+        return true;
+    }
 }
