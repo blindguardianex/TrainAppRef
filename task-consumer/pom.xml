@@ -16,7 +16,7 @@
         <maven.compiler.source>14</maven.compiler.source>
         <maven.compiler.target>14</maven.compiler.target>
         <spring.version>2.4.3</spring.version>
-        <main.class>com.smartru.performer.TaskPerformAppLauncher</main.class>
+        <main.class>com.smartru.consumer.TaskPerformAppLauncher</main.class>
     </properties>
 
     <build>

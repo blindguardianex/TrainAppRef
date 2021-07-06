@@ -1,60 +1,48 @@
-package com.smartru.prime;
+package com.smartru.performers.prime;
 
 import com.smartru.common.entity.Task;
 import com.smartru.common.entity.TaskResult;
 import com.smartru.common.model.Performer;
-import com.smartru.common.service.jpa.TaskService;
-import com.smartru.prime.checker.DelegatePrimeNumberChecker;
+import com.smartru.performers.PerformHelper;
+import com.smartru.performers.prime.checker.DelegatePrimeNumberChecker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-/**
- * TODO: Убрать зависимоть от taskService(???)
- */
 @Slf4j
 @Component
 @Qualifier("PrimeNumberCheckerPerformer")
-public class TaskPerformer implements Performer {
+public class PrimeNumberCheckPerformer implements Performer {
 
-    private final TaskService taskService;
+    private final PerformHelper helper;
     private final DelegatePrimeNumberChecker numberChecker;
 
     @Value("${number-checker.digit-capacity.minimum:17}")
     private int MIN_BOUND_FOR_CHECK_RESULT_IN_DATABASE;
 
     @Autowired
-    public TaskPerformer(TaskService taskService, DelegatePrimeNumberChecker numberChecker) {
-        this.taskService = taskService;
+    public PrimeNumberCheckPerformer(PerformHelper helper, DelegatePrimeNumberChecker numberChecker) {
+        this.helper = helper;
         this.numberChecker = numberChecker;
     }
 
     @Override
     public TaskResult perform(Task task) {
         if(numIsBig(task)){
-            Optional<Task> optTask = taskService.getByNum(task.getNum());
+            Optional<Task> optTask = helper.findPerformTaskInDatabaseByNum(task.getNum());
             if (optTask.isPresent()){
-                return finishTask(task, optTask.get().getResult().isPrime());
+                return helper.finishTask(task, optTask.get().getResult().isPrime());
             }
         }
         boolean result = numberChecker.isPrimeNumber(task.getNum());
-        return finishTask(task, result);
+        return helper.finishTask(task, result);
     }
 
     private boolean numIsBig(Task task){
         return task.getNum().length() >= MIN_BOUND_FOR_CHECK_RESULT_IN_DATABASE;
-    }
-
-    private TaskResult finishTask(Task task, boolean result){
-        TaskResult taskResult = new TaskResult(task, result);
-        task.setResult(taskResult);
-        taskService.updateResult(task);
-        log.info("Task #{} is complete!", task.getId());
-        return task.getResult();
     }
 }

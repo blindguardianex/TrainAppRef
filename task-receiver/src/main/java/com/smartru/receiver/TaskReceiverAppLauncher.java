@@ -1,7 +1,7 @@
 package com.smartru.receiver;
 
 import com.smartru.common.bot.BotStarter;
-import com.smartru.rabbit.configuration.TaskQueueRabbitStarter;
+import com.smartru.common.service.messagebroker.BrokerStarter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.boot.SpringApplication;
@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ComponentScans;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import redis.clients.jedis.Jedis;
@@ -34,8 +35,8 @@ public class TaskReceiverAppLauncher {
     }
 
     private static void taskRabbitQueueStarting(){
-        TaskQueueRabbitStarter queueStarter = ctx.getBean(TaskQueueRabbitStarter.class);
-        queueStarter.declareTaskQueue();
+        BrokerStarter brokerStarter = ctx.getBean(BrokerStarter.class);
+        brokerStarter.declareQueues();
     }
 
     private static void testRedis(){

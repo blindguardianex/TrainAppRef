@@ -61,11 +61,11 @@ public class TaskController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         Task task = optTask.get();
-        if (!userOwnsTask(task, principal.getName()) || !taskIsActive(task)){
-            log.warn("Trying to get someone else's task or not active task by: {}",principal.getName());
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        if (userOwnsTask(task, principal.getName()) && taskIsActive(task)){
+            return new ResponseEntity<>(TaskDto.fromTask(task), HttpStatus.OK);
         }
-        return new ResponseEntity<>(TaskDto.fromTask(task), HttpStatus.OK);
+        log.warn("Trying to get someone else's task or not active task by: {}",principal.getName());
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
     @GetMapping()

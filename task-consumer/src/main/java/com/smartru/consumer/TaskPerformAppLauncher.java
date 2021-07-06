@@ -1,4 +1,4 @@
-package com.smartru.performer;
+package com.smartru.consumer;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;

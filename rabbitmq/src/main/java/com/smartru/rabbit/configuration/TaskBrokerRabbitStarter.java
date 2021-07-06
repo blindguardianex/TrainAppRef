@@ -1,5 +1,6 @@
 package com.smartru.rabbit.configuration;
 
+import com.smartru.common.service.messagebroker.BrokerStarter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
-public class TaskQueueRabbitStarter {
+public class TaskBrokerRabbitStarter implements BrokerStarter {
 
     @Value("${rabbit.task.routing-key}")
     private String httpTaskRoutingKey;
@@ -26,17 +27,18 @@ public class TaskQueueRabbitStarter {
     private final Queue telegramTaskQueue;
 
     @Autowired
-    public TaskQueueRabbitStarter(AmqpAdmin amqpAdmin,
-                                  Exchange taskExchange,
-                                  @Qualifier("httpTaskQueue") Queue httpTaskQueue,
-                                  @Qualifier("telegramTaskQueue") Queue telegramTaskQueue) {
+    public TaskBrokerRabbitStarter(AmqpAdmin amqpAdmin,
+                                   Exchange taskExchange,
+                                   @Qualifier("httpTaskQueue") Queue httpTaskQueue,
+                                   @Qualifier("telegramTaskQueue") Queue telegramTaskQueue) {
         this.amqpAdmin = amqpAdmin;
         this.taskExchange = taskExchange;
         this.httpTaskQueue = httpTaskQueue;
         this.telegramTaskQueue = telegramTaskQueue;
     }
 
-    public void declareTaskQueue(){
+    @Override
+    public void declareQueues(){
         Binding httpBinding = BindingBuilder.bind(httpTaskQueue)
                 .to(taskExchange)
                 .with(httpTaskRoutingKey).noargs();

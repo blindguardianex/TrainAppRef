@@ -23,9 +23,9 @@ import javax.persistence.EntityNotFoundException;
 
 @Slf4j
 @Component
-public class CheckNumberCommand implements IBotCommand {
+public class IsPrimeNumberCommand implements IBotCommand {
 
-    private final String IDENTIFIER = "check";
+    private final String IDENTIFIER = "is_prime";
     private final String DESCRIPTION = "Проверить число";
     private final String NUMERIC_PATTERN = "\\A\\d*\\Z";
 
@@ -38,10 +38,10 @@ public class CheckNumberCommand implements IBotCommand {
     private ThreadLocal<Message>localMessage = new ThreadLocal<>();
 
     @Autowired
-    public CheckNumberCommand(UserService userService,
-                              TaskService taskService,
-                              @Qualifier("telegramTaskRabbitService") TaskBrokerService taskBrokerService,
-                              ObjectMapper mapper) {
+    public IsPrimeNumberCommand(UserService userService,
+                                TaskService taskService,
+                                @Qualifier("telegramTaskRabbitService") TaskBrokerService taskBrokerService,
+                                ObjectMapper mapper) {
         this.taskService = taskService;
         this.taskBrokerService = taskBrokerService;
         this.mapper = mapper;

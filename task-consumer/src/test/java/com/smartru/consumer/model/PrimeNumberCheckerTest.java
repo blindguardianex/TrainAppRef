@@ -1,6 +1,6 @@
-package com.smartru.performer.model;
+package com.smartru.consumer.model;
 
-import com.smartru.prime.checker.DelegatePrimeNumberChecker;
+import com.smartru.performers.prime.checker.DelegatePrimeNumberChecker;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
