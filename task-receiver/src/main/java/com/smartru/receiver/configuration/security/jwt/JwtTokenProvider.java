@@ -2,7 +2,7 @@ package com.smartru.receiver.configuration.security.jwt;
 
 import com.smartru.common.entity.User;
 import com.smartru.common.service.jpa.UserService;
-import com.smartru.common.service.redis.TokenService;
+import com.smartru.common.service.token.TokenService;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

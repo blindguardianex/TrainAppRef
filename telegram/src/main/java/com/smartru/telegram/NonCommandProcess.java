@@ -1,6 +1,7 @@
 package com.smartru.telegram;
 
 import com.smartru.common.model.Calculator;
+import com.smartru.performers.calculator.math.ExpressionChecker;
 import com.smartru.telegram.commands.IsPrimeNumberCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,16 +16,17 @@ public class NonCommandProcess {
     @Autowired
     private Calculator calculator;
     private final DecimalFormat formatter = new DecimalFormat("#0.000");
-    private final String EXPRESSION_PATTERN = "[ +\\-*/^\\d()]*(SQRT|SIN|COS|TAN)*[+\\-*/^\\d()]*(SQRT|SIN|COS|TAN)*[+\\-*/^\\d()]*(SQRT|SIN|COS|TAN)*[+\\-*/^\\d()]*";
     private final String DEFAULT_ANSWER = "Привет! Я умею считать простые числа и алгебраические выражения. Напиши команду " +
                                             "/is_prime любое_число (или просто любое число)," +
-                                            "и я скажу тебе, простое оно, или нет, или напиши пример, и я решу его.";
+                                            "и я скажу тебе, простое оно, или нет, или напиши пример, и я решу его. " +
+                                            "Введи /help для более подробного описания";
 
     public String nonCommandExecute(Message message){
-        if (isExpression(message.getText())){
+        if (ExpressionChecker.isExpression(message.getText())){
             try {
                 double result = calculator.perform(message.getText());
-                String answer = message.getText()+" = "+formatter.format(result);
+                String formattedResult = formatResult(result);
+                String answer = message.getText()+" = "+formattedResult;
                 return answer;
             } catch (ParseException e) {
                 return e.getMessage();
@@ -33,7 +35,12 @@ public class NonCommandProcess {
             return DEFAULT_ANSWER;
         }
     }
-    private boolean isExpression(String text){
-        return true;
+
+    private String formatResult(double result){
+        String formatted = formatter.format(result);
+        if (formatted.endsWith(".000")){
+            formatted = formatted.substring(0,formatted.length()-4);
+        }
+        return formatted;
     }
 }

@@ -1,4 +1,4 @@
-package com.smartru.common.service.redis;
+package com.smartru.common.service.token;
 
 public interface CheckTokenService {
 

@@ -51,6 +51,48 @@ class MathCalculatorTest {
         System.out.println("Result: "+result);
         assertEquals(result,24.0);
         System.out.println();
+
+        expression = "LG(100)";
+        result = calculator.perform(expression);
+        System.out.println("Expression: "+expression);
+        System.out.println("Result: "+result);
+        assertEquals(result,2);
+        System.out.println();
+
+        expression = "LN(8)";
+        result = calculator.perform(expression);
+        System.out.println("Expression: "+expression);
+        System.out.println("Result: "+result);
+        assertEquals(result,2.0794415416798357);
+        System.out.println();
+
+        expression = "ABS(1)";
+        result = calculator.perform(expression);
+        System.out.println("Expression: "+expression);
+        System.out.println("Result: "+result);
+        assertEquals(result,1);
+        System.out.println();
+
+        expression = "ABS(-1)";
+        result = calculator.perform(expression);
+        System.out.println("Expression: "+expression);
+        System.out.println("Result: "+result);
+        assertEquals(result,1);
+        System.out.println();
+
+        expression = "DEGREES(2)";
+        result = calculator.perform(expression);
+        System.out.println("Expression: "+expression);
+        System.out.println("Result: "+result);
+        assertEquals(result,114.59155902616465);
+        System.out.println();
+
+        expression = "RADIANS(60)";
+        result = calculator.perform(expression);
+        System.out.println("Expression: "+expression);
+        System.out.println("Result: "+result);
+        assertEquals(result,1.0471975511965976);
+        System.out.println();
     }
 
 //    @Test

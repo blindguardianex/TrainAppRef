@@ -2,6 +2,7 @@ package com.smartru.telegram;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartru.common.entity.Task;
 import com.smartru.common.model.Calculator;
+import com.smartru.telegram.commands.HelpCommand;
 import com.smartru.telegram.commands.IsPrimeNumberCommand;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.Date;
 
@@ -29,25 +29,35 @@ public class PrimeNumberCheckTelegramBot extends TelegramLongPollingCommandBot {
     private String BOT_NAME;
     @Value("${bot.telegram.token}")
     private String BOT_TOKEN;
-    @Autowired
-    private NonCommandProcess nonCommand;
+
     @Autowired
     private Calculator calculator;
-    private IsPrimeNumberCommand isPrimeNumberCommand;
+    private final HelpCommand helpCommand;
+    private final NonCommandProcess nonCommand;
+    private final IsPrimeNumberCommand isPrimeNumberCommand;
     private final ObjectMapper mapper = new ObjectMapper();
     private final Date START_DATE;
     private final String NUMBER_PATTERN = "\\A\\d*\\Z";
 
 
-    public PrimeNumberCheckTelegramBot(IsPrimeNumberCommand isPrimeNumberCommand){
+    @Autowired
+    public PrimeNumberCheckTelegramBot(HelpCommand helpCommand, NonCommandProcess nonCommand, IsPrimeNumberCommand isPrimeNumberCommand){
+        this.helpCommand = helpCommand;
+        this.nonCommand = nonCommand;
         this.isPrimeNumberCommand = isPrimeNumberCommand;
         START_DATE = new Date();
+        register(helpCommand);
         register(isPrimeNumberCommand);
     }
 
     @Override
     public void processNonCommandUpdate(Update update) {
-        Message msg = update.getMessage();
+        Message msg;
+        if(update.getEditedMessage()!=null){
+            msg = update.getEditedMessage();
+        } else {
+            msg = update.getMessage();
+        }
         if (outOfDate(msg)) {
             return;
         }
@@ -86,7 +96,10 @@ public class PrimeNumberCheckTelegramBot extends TelegramLongPollingCommandBot {
      * @return
      */
     private boolean outOfDate(Message message){
-        return false;
+        System.out.println(START_DATE.getTime()/1000);
+        System.out.println(message.getDate());
+        System.out.println();
+        return START_DATE.getTime()/1000000>message.getDate()/1000;
     }
 
     private boolean isNumber(String text){

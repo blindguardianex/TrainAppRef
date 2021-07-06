@@ -4,7 +4,7 @@ import com.smartru.common.model.Calculator;
 import com.smartru.performers.calculator.math.BracketsChecker;
 import com.smartru.performers.calculator.math.BiOperator;
 import com.smartru.performers.calculator.math.ExpressionIterator;
-import com.smartru.performers.calculator.math.UOperator;
+import com.smartru.performers.calculator.math.FunctionOperator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -36,7 +36,6 @@ public class MathCalculator implements Calculator {
         expression = trimExpression(expression);
         checkBrackets(expression);
         String postfixExpression = infixToPostfix(expression);
-        System.out.println("Postfix: "+postfixExpression);
         double result = calculate(postfixExpression);
         return result;
     }
@@ -64,6 +63,7 @@ public class MathCalculator implements Calculator {
         addActualOperandToExpression();
         addRemainingOperatorsFromStack();
         String result = postfixExpression.toString();
+        flushAll();
         return result.trim();
     }
 
@@ -88,7 +88,7 @@ public class MathCalculator implements Calculator {
     }
 
     private void processUOperator() throws ParseException {
-        UOperator currentOperator = getCurrentUOperator();
+        FunctionOperator currentOperator = getCurrentUOperator();
         flushOperand();
 
         StringBuilder subExpression = new StringBuilder();
@@ -126,6 +126,11 @@ public class MathCalculator implements Calculator {
                 expression.startsWith("-")){
             expression = "0"+expression;
         }
+        else if (expression.startsWith("(+") ||
+                expression.startsWith("(-")){
+            expression = "(0"+expression.substring(1);
+        }
+
         expression = expression.replace(" ", "");
         expression = expression.replace(",",".");
         return expression;
@@ -142,8 +147,8 @@ public class MathCalculator implements Calculator {
         return expressionIterator.next();
     }
 
-    private UOperator getCurrentUOperator(){
-        return UOperator.getOperator(operand.toString());
+    private FunctionOperator getCurrentUOperator(){
+        return FunctionOperator.getOperator(operand.toString());
     }
 
     private void addActualOperandToExpression() throws ParseException {
@@ -167,6 +172,12 @@ public class MathCalculator implements Calculator {
         operand.delete(0, operand.length());
     }
 
+    private void flushAll(){
+        operand.delete(0, operand.length());
+        biOperators.clear();
+        postfixExpression.delete(0,postfixExpression.length());
+    }
+
     private void addSubExpressionToExpression(){
         while (operatorStackNotEmptyAndNextOperatorNotOpenBracket()){
             addToExpression(biOperators.pop());
@@ -182,7 +193,7 @@ public class MathCalculator implements Calculator {
     }
 
     private boolean operandIsUOperator(){
-        return UOperator.isUOperator(operand.toString());
+        return FunctionOperator.isUOperator(operand.toString());
     }
 
     private boolean operatorStackIsEmpty(){
