@@ -1,8 +1,8 @@
-package com.smartru.telegram;
+package com.smartru.telegram.model;
 
 import com.smartru.common.bot.BotStarter;
+import com.smartru.telegram.TelegramBotCore;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.constraints.CodePointLength;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -14,7 +14,7 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 public class TelegramBotStarter implements BotStarter {
 
     @Autowired
-    private PrimeNumberCheckTelegramBot telegramBot;
+    private TelegramBotCore telegramBot;
 
     @Override
     public void start() {

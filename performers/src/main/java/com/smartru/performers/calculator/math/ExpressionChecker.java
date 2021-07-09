@@ -11,10 +11,13 @@ public class ExpressionChecker {
 
     public static boolean isExpression(String expression){
         expression = expression.toUpperCase();
-        Matcher expressionMatcher = EXPRESSION_PATTERN.matcher(expression);
-        expression = expressionMatcher.replaceAll("");
+
         Matcher functionMatcher = FUNCTION_PATTERN.matcher(expression);
         expression = functionMatcher.replaceAll("");
+
+        Matcher expressionMatcher = EXPRESSION_PATTERN.matcher(expression);
+        expression = expressionMatcher.replaceAll("");
+
         return expression.isBlank();
     }
 }

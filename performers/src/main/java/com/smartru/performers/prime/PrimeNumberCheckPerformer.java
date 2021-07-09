@@ -2,6 +2,7 @@ package com.smartru.performers.prime;
 
 import com.smartru.common.entity.Task;
 import com.smartru.common.entity.TaskResult;
+import com.smartru.common.model.BooleanPerformer;
 import com.smartru.common.model.Performer;
 import com.smartru.performers.PerformHelper;
 import com.smartru.performers.prime.checker.DelegatePrimeNumberChecker;
@@ -16,7 +17,7 @@ import java.util.Optional;
 @Slf4j
 @Component
 @Qualifier("PrimeNumberCheckerPerformer")
-public class PrimeNumberCheckPerformer implements Performer {
+public class PrimeNumberCheckPerformer implements BooleanPerformer {
 
     private final PerformHelper helper;
     private final DelegatePrimeNumberChecker numberChecker;
@@ -31,7 +32,7 @@ public class PrimeNumberCheckPerformer implements Performer {
     }
 
     @Override
-    public TaskResult perform(Task task) {
+    public boolean perform(Task task) {
         if(numIsBig(task)){
             Optional<Task> optTask = helper.findPerformTaskInDatabaseByNum(task.getNum());
             if (optTask.isPresent()){

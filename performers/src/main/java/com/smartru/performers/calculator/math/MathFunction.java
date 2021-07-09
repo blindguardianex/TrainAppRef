@@ -2,6 +2,7 @@ package com.smartru.performers.calculator.math;
 
 import java.util.Arrays;
 import java.util.function.UnaryOperator;
+import java.util.stream.IntStream;
 
 /**
  * !!!ВНИМАНИЕ!!!
@@ -9,7 +10,7 @@ import java.util.function.UnaryOperator;
  * выражение в классе ExpressionChecker!!!
  * @see ExpressionChecker
  */
-public enum FunctionOperator {
+public enum MathFunction {
 
     SQRT("SQRT", Math::sqrt),
     LN("LN", Math::log),
@@ -50,22 +51,22 @@ public enum FunctionOperator {
         return Math.atan(radians)+2*Math.atan(1);
     });
 
-    private final String name;
+    private final String appellation;
     private final UnaryOperator<Double> function;
 
-    FunctionOperator(String name, UnaryOperator<Double> function) {
-        this.name = name;
+    MathFunction(String appellation, UnaryOperator<Double> function) {
+        this.appellation = appellation;
         this.function = function;
     }
 
-    public static boolean isUOperator(String funcName){
-        return Arrays.stream(FunctionOperator.values())
-                .anyMatch(op->op.name().equalsIgnoreCase(funcName));
+    public static boolean isMathFunction(String funcName){
+        return Arrays.stream(MathFunction.values())
+                .anyMatch(op->op.appellation.equalsIgnoreCase(funcName));
     }
 
-    public static FunctionOperator getOperator(String name){
-        return Arrays.stream(FunctionOperator.values())
-                .filter(op->op.name().equalsIgnoreCase(name))
+    public static MathFunction getMathFunctionBy(String name){
+        return Arrays.stream(MathFunction.values())
+                .filter(op->op.appellation.equalsIgnoreCase(name))
                 .findFirst()
                 .get();
     }

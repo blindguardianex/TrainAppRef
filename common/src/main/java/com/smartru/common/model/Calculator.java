@@ -4,5 +4,5 @@ import java.text.ParseException;
 
 public interface Calculator {
 
-    double perform(String expression) throws ParseException;
+    double solve(String expression) throws ParseException;
 }

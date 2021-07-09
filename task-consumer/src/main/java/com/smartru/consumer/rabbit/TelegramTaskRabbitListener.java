@@ -2,6 +2,7 @@ package com.smartru.consumer.rabbit;
 
 import com.smartru.common.entity.Task;
 import com.smartru.common.exceptions.TelegramModuleNotInclude;
+import com.smartru.common.model.StringPerformer;
 import com.smartru.common.model.VoidPerformer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class TelegramTaskRabbitListener {
 
     @Autowired(required = false)
-    @Qualifier("telegramPrimeNumberCheckerPerformer")
+    @Qualifier("telegramDecomposeNumberPerformer")
     private VoidPerformer performer;
     private final String TASK_TYPE = Task.Type.TELEGRAM.toString();
 

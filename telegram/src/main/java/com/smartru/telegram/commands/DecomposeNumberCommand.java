@@ -7,6 +7,7 @@ import com.smartru.common.entity.User;
 import com.smartru.common.service.jpa.TaskService;
 import com.smartru.common.service.jpa.UserService;
 import com.smartru.common.service.messagebroker.TaskBrokerService;
+import com.smartru.telegram.Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,10 +24,10 @@ import javax.persistence.EntityNotFoundException;
 
 @Slf4j
 @Component
-public class IsPrimeNumberCommand implements IBotCommand {
+public class DecomposeNumberCommand implements IBotCommand {
 
-    private final String IDENTIFIER = "is_prime";
-    private final String DESCRIPTION = "Проверить число";
+    private final String IDENTIFIER = "decompose";
+    private final String DESCRIPTION = "Разложить число на множители";
     private final String NUMERIC_PATTERN = "\\A\\d*\\Z";
 
     private User TELEGRAM_USER;
@@ -38,10 +39,10 @@ public class IsPrimeNumberCommand implements IBotCommand {
     private ThreadLocal<Message>localMessage = new ThreadLocal<>();
 
     @Autowired
-    public IsPrimeNumberCommand(UserService userService,
-                                TaskService taskService,
-                                @Qualifier("telegramTaskRabbitService") TaskBrokerService taskBrokerService,
-                                ObjectMapper mapper) {
+    public DecomposeNumberCommand(UserService userService,
+                                  TaskService taskService,
+                                  @Qualifier("telegramTaskRabbitService") TaskBrokerService taskBrokerService,
+                                  ObjectMapper mapper) {
         this.taskService = taskService;
         this.taskBrokerService = taskBrokerService;
         this.mapper = mapper;
@@ -67,7 +68,7 @@ public class IsPrimeNumberCommand implements IBotCommand {
             sendDefaultPreAnswer(num);
             sendTypingEvent();
 
-            Task task = createTask(num, message.getChatId());
+            Task task = createTask(num, message);
             sendTelegramTaskForExecution(task);
         } else {
             sendErrorMessage(num);
@@ -80,32 +81,28 @@ public class IsPrimeNumberCommand implements IBotCommand {
 
     private void sendDefaultPreAnswer(String num){
         if (num.length()>13) {
-            SendMessage msg = new SendMessage(localMessage.get().getChatId().toString(),
-                    "Я отправлю тебе ответ как только полностью проверю число: #" + num);
+            SendMessage msg = Util.createMessage(localMessage.get(),
+                    String.format("я отправлю тебе ответ как только полностью проверю число: #" + num));
             sendToTelegram(msg);
         }
     }
 
     private void sendErrorMessage(String num){
+        SendMessage msg;
         if (!isNumber(num)){
-            SendMessage msg = new SendMessage(localMessage.get().getChatId().toString(),
-                    "Извини, но я работаю только с числами.");
-            sendToTelegram(msg);
+            msg = Util.createMessage(localMessage.get(), "извини, но я работаю только с числами.");
         } else if (numIsTooLarge(num)) {
-            SendMessage msg = new SendMessage(localMessage.get().getChatId().toString(),
-                    "Извини, но я не могу проверить такое число! Максимальная длина числа: 23 разряда");
-            sendToTelegram(msg);
+            msg = Util.createMessage(localMessage.get(), "извини, но я не могу проверить такое число! Максимальная длина числа: 23 разряда");
         } else {
-            SendMessage msg = new SendMessage(localMessage.get().getChatId().toString(),
-                    "По какой-то причине твое сообщение принято некорректным! Возможно, это гендерное неравенство...");
-            sendToTelegram(msg);
+            msg = Util.createMessage(localMessage.get(), "по какой-то причине твое сообщение принято некорректным! Возможно, это гендерное неравенство...");
         }
+        sendToTelegram(msg);
     }
 
-    private Task createTask(String num, long chatId){
+    private Task createTask(String num, Message message){
         Task task = new Task(num);
         task.setUser(TELEGRAM_USER);
-        task.setProperties(createTaskProperties(chatId));
+        task.setProperties(createTaskProperties(message));
         taskService.add(task);
         return task;
     }
@@ -141,10 +138,11 @@ public class IsPrimeNumberCommand implements IBotCommand {
                 .orElseThrow(EntityNotFoundException::new);
     }
 
-    private ObjectNode createTaskProperties(long chatId){
+    private ObjectNode createTaskProperties(Message message){
         ObjectNode properties = mapper.createObjectNode();
         properties.put("type", Task.Type.TELEGRAM.toString());
-        properties.put("chatId", chatId);
+        properties.put("chatId", message.getChatId());
+        properties.put("username", usernameFromMessage(message));
         return properties;
     }
 
@@ -154,5 +152,11 @@ public class IsPrimeNumberCommand implements IBotCommand {
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
+    }
+
+    private String usernameFromMessage(Message msg){
+        org.telegram.telegrambots.meta.api.objects.User user = msg.getFrom();
+        String username = user.getUserName();
+        return "@"+username;
     }
 }

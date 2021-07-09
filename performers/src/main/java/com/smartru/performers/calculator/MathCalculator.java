@@ -2,10 +2,11 @@ package com.smartru.performers.calculator;
 
 import com.smartru.common.model.Calculator;
 import com.smartru.performers.calculator.math.BracketsChecker;
-import com.smartru.performers.calculator.math.BiOperator;
+import com.smartru.performers.calculator.math.MathOperator;
 import com.smartru.performers.calculator.math.ExpressionIterator;
-import com.smartru.performers.calculator.math.FunctionOperator;
+import com.smartru.performers.calculator.math.MathFunction;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -21,18 +22,19 @@ import java.util.Stack;
 @Slf4j
 @Component
 @Scope("prototype")
+@Qualifier("mathCalculator")
 public class MathCalculator implements Calculator {
 
     private final String OPERAND_PATTERN = "^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$";
-    private final Comparator<BiOperator>comparator = BiOperator.getComparator();
+    private final Comparator<MathOperator>comparator = MathOperator.getComparator();
     private final StringBuilder postfixExpression = new StringBuilder();
     private final StringBuilder operand = new StringBuilder();
-    private final Stack<BiOperator> biOperators = new Stack<>();
+    private final Stack<MathOperator> mathOperators = new Stack<>();
 
     private Iterator<Character> expressionIterator;
 
     @Override
-    public double perform(String expression) throws ParseException {
+    public double solve(String expression) throws ParseException {
         expression = trimExpression(expression);
         checkBrackets(expression);
         String postfixExpression = infixToPostfix(expression);
@@ -50,14 +52,14 @@ public class MathCalculator implements Calculator {
         expressionIterator = new ExpressionIterator(expression);
         while (expressionIterator.hasNext()) {
             char ch = nextCharFromExpression();
-            if (isBiOperator(ch)) {
+            if (isMathOperator(ch)) {
                 addActualOperandToExpression();
-                parseBiOperator(BiOperator.getOperator(ch));
+                parseMathOperator(MathOperator.getMathOperatorBy(ch));
             } else {
                 operand.append(ch);
             }
-            if (operandIsUOperator()) {
-                processUOperator();
+            if (operandIsMathFunction()) {
+                processMathFunction();
             }
         }
         addActualOperandToExpression();
@@ -67,28 +69,28 @@ public class MathCalculator implements Calculator {
         return result.trim();
     }
 
-    private void parseBiOperator(BiOperator currentOperator){
+    private void parseMathOperator(MathOperator currentOperator){
         if (operatorStackIsEmpty()){
-            biOperators.push(currentOperator);
+            mathOperators.push(currentOperator);
         }
         else if(operatorIsOpenBracket(currentOperator)){
-            biOperators.push(currentOperator);
+            mathOperators.push(currentOperator);
         }
         else if(operatorIsCloseBracket(currentOperator)){
             addSubExpressionToExpression();
         }
-        else if (nextOperatorLowerPriority(currentOperator)){
-            biOperators.push(currentOperator);
+        else if (prevOperatorLowerPriority(currentOperator)){
+            mathOperators.push(currentOperator);
         }
         else {
-            BiOperator topOperator = biOperators.pop();
+            MathOperator topOperator = mathOperators.pop();
             addToExpression(topOperator);
-            biOperators.push(currentOperator);
+            mathOperators.push(currentOperator);
         }
     }
 
-    private void processUOperator() throws ParseException {
-        FunctionOperator currentOperator = getCurrentUOperator();
+    private void processMathFunction() throws ParseException {
+        MathFunction currentOperator = getCurrentMathFunction();
         flushOperand();
 
         StringBuilder subExpression = new StringBuilder();
@@ -98,7 +100,7 @@ public class MathCalculator implements Calculator {
         }
 
         MathCalculator subCalculator = new MathCalculator();
-        double subExpressionResult = subCalculator.perform(subExpression.toString());
+        double subExpressionResult = subCalculator.solve(subExpression.toString());
         double result = currentOperator.apply(subExpressionResult);
         operand.append(result);
         addActualOperandToExpression();
@@ -108,8 +110,8 @@ public class MathCalculator implements Calculator {
         Stack<Double>operands = new Stack<>();
         String[]expressionElements = postfixExpression.split(" ");
         for(String element:expressionElements){
-            if (isBiOperator(element)){
-                BiOperator operator = BiOperator.getOperator(element);
+            if (isMathOperator(element)){
+                MathOperator operator = MathOperator.getMathOperatorBy(element);
                 Double operand2 = operands.pop();
                 Double operand1 = operands.pop();
                 operands.push(operator.apply(operand1, operand2));
@@ -136,8 +138,8 @@ public class MathCalculator implements Calculator {
         return expression;
     }
 
-    private void addToExpression(BiOperator op){
-        if (op!= BiOperator.OPEN_BRACKET && op!= BiOperator.CLOSE_BRACKET) {
+    private void addToExpression(MathOperator op){
+        if (op!= MathOperator.OPEN_BRACKET && op!= MathOperator.CLOSE_BRACKET) {
             postfixExpression.append(" ");
             postfixExpression.append(op.getOp());
         }
@@ -147,14 +149,16 @@ public class MathCalculator implements Calculator {
         return expressionIterator.next();
     }
 
-    private FunctionOperator getCurrentUOperator(){
-        return FunctionOperator.getOperator(operand.toString());
+    private MathFunction getCurrentMathFunction(){
+        return MathFunction.getMathFunctionBy(operand.toString());
     }
 
     private void addActualOperandToExpression() throws ParseException {
         if (operand.length()>0) {
             if (!operand.toString().matches(OPERAND_PATTERN)){
-                throw new ParseException("Ошибка в введенном выражении: "+operand,0);
+                String errorOperand = operand.toString();
+                flushAll();
+                throw new ParseException("Ошибка в введенном выражении: "+errorOperand,0);
             }
             postfixExpression.append(" ");
             postfixExpression.append(operand);
@@ -164,7 +168,7 @@ public class MathCalculator implements Calculator {
 
     private void addRemainingOperatorsFromStack(){
         while (!operatorStackIsEmpty()){
-            addToExpression(biOperators.pop());
+            addToExpression(mathOperators.pop());
         }
     }
 
@@ -174,46 +178,46 @@ public class MathCalculator implements Calculator {
 
     private void flushAll(){
         operand.delete(0, operand.length());
-        biOperators.clear();
+        mathOperators.clear();
         postfixExpression.delete(0,postfixExpression.length());
     }
 
     private void addSubExpressionToExpression(){
         while (operatorStackNotEmptyAndNextOperatorNotOpenBracket()){
-            addToExpression(biOperators.pop());
+            addToExpression(mathOperators.pop());
         }
     }
 
-    private boolean isBiOperator(char ch){
-        return BiOperator.isBiOperator(ch);
+    private boolean isMathOperator(char ch){
+        return MathOperator.isMathOperator(ch);
     }
 
-    private boolean isBiOperator(String element){
-        return BiOperator.isBiOperator(element);
+    private boolean isMathOperator(String element){
+        return MathOperator.isMathOperator(element);
     }
 
-    private boolean operandIsUOperator(){
-        return FunctionOperator.isUOperator(operand.toString());
+    private boolean operandIsMathFunction(){
+        return MathFunction.isMathFunction(operand.toString());
     }
 
     private boolean operatorStackIsEmpty(){
-        return biOperators.isEmpty();
+        return mathOperators.isEmpty();
     }
 
-    private boolean operatorIsOpenBracket(BiOperator op){
-        return op==BiOperator.OPEN_BRACKET;
+    private boolean operatorIsOpenBracket(MathOperator op){
+        return op== MathOperator.OPEN_BRACKET;
     }
 
-    private boolean operatorIsCloseBracket(BiOperator op){
-        return op== BiOperator.CLOSE_BRACKET;
+    private boolean operatorIsCloseBracket(MathOperator op){
+        return op== MathOperator.CLOSE_BRACKET;
     }
 
     private boolean operatorStackNotEmptyAndNextOperatorNotOpenBracket(){
-        return !biOperators.isEmpty() && biOperators.peek()!= BiOperator.OPEN_BRACKET;
+        return !mathOperators.isEmpty() && mathOperators.peek()!= MathOperator.OPEN_BRACKET;
     }
 
-    private boolean nextOperatorLowerPriority(BiOperator op){
-        return comparator.compare(op, biOperators.peek()) > 0;
+    private boolean prevOperatorLowerPriority(MathOperator op){
+        return comparator.compare(op, mathOperators.peek()) > 0;
     }
 
     private boolean subExpressionIsNotEnd(CharSequence subExpression){

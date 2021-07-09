@@ -1,6 +1,7 @@
 package com.smartru.consumer.rabbit;
 
 import com.smartru.common.entity.Task;
+import com.smartru.common.model.BooleanPerformer;
 import com.smartru.common.model.Performer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -16,7 +17,7 @@ public class TaskRabbitListener {
 
     @Autowired
     @Qualifier("PrimeNumberCheckerPerformer")
-    private Performer isPrimeChecker;
+    private BooleanPerformer isPrimeChecker;
     private final String TASK_TYPE = Task.Type.HTTP.toString();
 
     @RabbitHandler
@@ -24,7 +25,7 @@ public class TaskRabbitListener {
         log.info("Getting task #{} from http", task.getId());
         if (taskHasHttpType(task)) {
             log.info("Getting task #{} from telegram", task.getId());
-            isPrimeChecker.perform(task);
+            boolean result = isPrimeChecker.perform(task);
         }
         else {
             log.error("Incorrect task type (not http) in http task queue! Task #{}", task.getId());

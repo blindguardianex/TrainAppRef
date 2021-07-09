@@ -18,6 +18,7 @@
         <module>rabbitmq</module>
         <module>performers</module>
         <module>redis</module>
+        <module>emotion</module>
     </modules>
 
     <properties>

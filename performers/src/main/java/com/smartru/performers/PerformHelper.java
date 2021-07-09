@@ -16,12 +16,12 @@ public class PerformHelper {
     @Autowired
     private TaskService taskService;
 
-    public TaskResult finishTask(Task task, boolean result){
+    public boolean finishTask(Task task, boolean result){
         TaskResult taskResult = new TaskResult(task, result);
         task.setResult(taskResult);
         taskService.updateResult(task);
         log.info("Task #{} is complete!", task.getId());
-        return task.getResult();
+        return task.getResult().isPrime();
     }
 
     public Optional<Task>findPerformTaskInDatabaseByNum(String num){
